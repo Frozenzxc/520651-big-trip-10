@@ -19,21 +19,20 @@ const createOfferMarkup = (offers) => {
 };
 
 const createCardEditTemplate = (card) => {
-  const {type, destination, startTime, endTime, offers, description} = card;
   let sum = 0;
-  offers.forEach((it) => {
+  card.offers.forEach((it) => {
     sum += it.price;
     return sum;
   });
 
-  const offerList = createOfferMarkup(Array.from(offers));
+  const offerList = createOfferMarkup(Array.from(card.offers));
   return (
     `<form class="event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
                         <label class="event__type  event__type-btn" for="event-type-toggle-1">
                           <span class="visually-hidden">Choose event type</span>
-                          <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+                          <img class="event__type-icon" width="17" height="17" src="img/icons/${card.type}.png" alt="Event type icon">
                         </label>
                         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -100,9 +99,9 @@ const createCardEditTemplate = (card) => {
 
                       <div class="event__field-group  event__field-group--destination">
                         <label class="event__label  event__type-output" for="event-destination-1">
-                          ${type} at
+                          ${card.type} at
                         </label>
-                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.destination}" list="destination-list-1">
                         <datalist id="destination-list-1">
                           <option value="Amsterdam"></option>
                           <option value="Geneva"></option>
@@ -114,12 +113,12 @@ const createCardEditTemplate = (card) => {
                         <label class="visually-hidden" for="event-start-time-1">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(startTime)}">
+                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(card.startTime)}">
                         &mdash;
                         <label class="visually-hidden" for="event-end-time-1">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(endTime)}">
+                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(card.endTime)}">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
@@ -158,7 +157,7 @@ const createCardEditTemplate = (card) => {
 
                       <section class="event__section  event__section--destination">
                         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">${description}</p>
+                        <p class="event__destination-description">${card.description}</p>
 
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
