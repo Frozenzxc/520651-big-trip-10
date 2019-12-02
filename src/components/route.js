@@ -6,10 +6,11 @@ const getTripRoutes = (cards) => {
 };
 
 const createRouteTemplate = (cards) => {
+
   return (
     `<div class="trip-info__main">
         <h1 class="trip-info__title">${getTripRoutes(cards)}</h1>
-        <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;21</p>
+        <p class="trip-info__dates">${(cards[0].startTime).toDateString().substr(4, 6)}&nbsp;&mdash;&nbsp;${(cards[cards.length - 1].endTime).toDateString().substr(4, 6)}</p>
     </div>`
   );
 };

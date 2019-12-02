@@ -2,15 +2,15 @@ import {formatDate} from "../util";
 
 const createOfferMarkup = (offers) => {
   return offers
-    .map((offer) => {
+    .map(({type, name, price, isChecked}) => {
       return (
         `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" 
-            ${offer.isChecked ? `checked` : ``}>
-            <label class="event__offer-label" for="event-offer-${offer.type}-1">
-                <span class="event__offer-title">${offer.name}</span>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-${type}" 
+            ${isChecked ? `checked` : ``}>
+            <label class="event__offer-label" for="event-offer-${type}-1">
+                <span class="event__offer-title">${name}</span>
                 &plus;
-                &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+                &euro;&nbsp;<span class="event__offer-price">${price}</span>
              </label>
             </div>`
       );
@@ -19,13 +19,8 @@ const createOfferMarkup = (offers) => {
 };
 
 const createCardEditTemplate = (card) => {
-  let sum = 0;
-  card.offers.forEach((it) => {
-    sum += it.price;
-    return sum;
-  });
 
-  const offerList = createOfferMarkup(Array.from(card.offers));
+  const offerList = createOfferMarkup(card.offers);
   return (
     `<form class="event  event--edit" action="#" method="post">
                     <header class="event__header">
@@ -123,10 +118,10 @@ const createCardEditTemplate = (card) => {
 
                       <div class="event__field-group  event__field-group--price">
                         <label class="event__label" for="event-price-1">
-                          <span class="visually-hidden">${sum}</span>
+                          <span class="visually-hidden">${card.price}</span>
                           &euro;
                         </label>
-                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${sum}">
+                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${card.price}">
                       </div>
 
                       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>

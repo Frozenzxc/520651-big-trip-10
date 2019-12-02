@@ -84,7 +84,8 @@ const generateCard = () => {
     startTime: getRandomDate(),
     endTime: getRandomDate(),
     offers: generateOptions(additionalOptions),
-    description: generateDescription(tripDescription)
+    description: generateDescription(tripDescription),
+    price: getRandomIntegerNumber(100, 1000)
   };
 };
 
@@ -97,5 +98,7 @@ const generateCards = (count) => {
 const CARD_COUNT = 4;
 
 const cards = generateCards(CARD_COUNT);
+
+cards.sort((a, b) => Date.parse(a.startTime) > Date.parse(b.startTime) ? 1 : -1);
 
 export {cards};

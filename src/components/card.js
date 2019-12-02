@@ -2,12 +2,12 @@ import {formatTime, getDuration} from "../util";
 
 const createOfferMarkup = (offers) => {
   return offers
-    .map((offer) => {
+    .map(({name, price}) => {
       return (
         `<li class="event__offer">
-          <span class="event__offer-title">${offer.name}</span>
+          <span class="event__offer-title">${name}</span>
           +
-          &euro;<span class="event__offer-price">${offer.price}</span>
+          &euro;<span class="event__offer-price">${price}</span>
          </li>`
       );
     })
@@ -15,11 +15,9 @@ const createOfferMarkup = (offers) => {
 };
 
 const createCardTemplate = (card) => {
-  let sum = 0;
-  card.offers.forEach((it) => {
-    sum += it.price;
-  });
-  const offerList = createOfferMarkup(Array.from(card.offers));
+
+  const offerList = createOfferMarkup(card.offers);
+
   return (
     `<li class="trip-events__item">
         <div class="event">
@@ -36,7 +34,7 @@ const createCardTemplate = (card) => {
             <p class="event__duration">${getDuration(card.startTime, card.endTime)}</p>
           </div>
           <p class="event__price">
-            &euro;&nbsp;<span class="event__price-value">${sum}</span>
+            &euro;&nbsp;<span class="event__price-value">${card.price}</span>
           </p>
           <h4 class="visually-hidden">Offers:</h4>
           <ul class="event__selected-offers">
