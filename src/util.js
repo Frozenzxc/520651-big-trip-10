@@ -1,3 +1,25 @@
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
+
+const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
@@ -25,8 +47,9 @@ const getDuration = (start, end) => {
   duration.minutes = end.getMinutes() - start.getMinutes();
   if (duration.minutes < 0) {
     duration.hours = duration.hours - 1;
+    duration.minutes += 60;
   }
   return duration.hours + `H` + ` ` + duration.minutes + `M`;
 };
 
-export {formatTime, getDuration, formatDate};
+export {formatTime, getDuration, formatDate, createElement, RenderPosition, render};

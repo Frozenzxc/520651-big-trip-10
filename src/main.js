@@ -1,41 +1,66 @@
-import {createMenuTemplate} from "./components/menu";
-import {createFilterTemplate} from "./components/filter";
-import {createTripsTemplate} from "./components/trip-list";
-import {createSortTemplate} from "./components/sort";
-import {createCardTemplate} from "./components/card";
-import {createRouteTemplate} from "./components/route";
-import {createCardEditTemplate} from "./components/card-editor";
-import {cards} from "./mock/card";
+import {cards, boards} from "./mock/card";
 import {menu} from "./mock/menu";
 import {filters} from "./mock/filter";
-
-const render = (container, template, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, template);
-};
+import {render, RenderPosition} from "./util";
+import {
+  Menu,
+  Sort,
+  Filter,
+  Route,
+  Card,
+  CardEdit,
+  Trips
+} from "./components/index";
 
 const siteHeaderControls = document.querySelector(`.trip-controls`);
 
-render(siteHeaderControls, createMenuTemplate(menu));
-render(siteHeaderControls, createFilterTemplate(filters));
+render(siteHeaderControls, new Menu(menu).getElement(), RenderPosition.BEFOREEND);
+render(siteHeaderControls, new Filter(filters).getElement(), RenderPosition.BEFOREEND);
 
 const tripBoard = document.querySelector(`.trip-events`);
 
-render(tripBoard, createSortTemplate());
-render(tripBoard, createTripsTemplate(cards));
+render(tripBoard, new Sort().getElement(), RenderPosition.AFTERBEGIN);
 
-const tripList = tripBoard.querySelector(`.trip-events__list`);
+const tripDayList = tripBoard.querySelector(`.trip-days`);
 
-render(tripList, createCardEditTemplate(cards[0]));
+const renderCard = (card, place) => {
+  const cardComponent = new Card(card);
+  const cardEditComponent = new CardEdit(card);
 
-const MAX_CARD = 4;
+  const editButton = cardComponent.getElement().querySelector(`.event__rollup-btn`);
+  editButton.addEventListener(`click`, () => {
+    place.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
+  });
 
-cards.slice(1, MAX_CARD).forEach((card) => render(tripList, createCardTemplate(card), `beforeend`));
+  const editForm = cardEditComponent.getElement();
+  editForm.addEventListener(`submit`, () => {
+    place.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
+  });
+
+  render(place, cardComponent.getElement(), RenderPosition.BEFOREEND);
+};
+
+
+let dayCount = 1;
+boards.forEach((it) => {
+  const trip = new Trips(it, dayCount);
+  render(tripDayList, trip.getElement(), RenderPosition.BEFOREEND);
+  const tripList = trip.getElement().querySelector(`.trip-events__list`);
+  cards.forEach((card) => {
+    if (card.startTime === it) {
+      renderCard(card, tripList);
+    }
+  });
+  dayCount++;
+});
+
 const tripRoute = document.querySelector(`.trip-info`);
 
-render(tripRoute, createRouteTemplate(cards), `afterbegin`);
+render(tripRoute, new Route(cards).getElement(), RenderPosition.AFTERBEGIN);
 
 const tripCost = document.querySelector(`.trip-info__cost-value`);
 
 tripCost.textContent = cards.reduce((sum, it) => {
   return sum + parseFloat(it.price);
 }, 0);
+

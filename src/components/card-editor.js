@@ -1,4 +1,4 @@
-import {formatDate} from "../util";
+import {createElement, formatDate} from "../util";
 
 const createOfferMarkup = (offers) => {
   return offers
@@ -108,12 +108,12 @@ const createCardEditTemplate = (card) => {
                         <label class="visually-hidden" for="event-start-time-1">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(card.startTime)}">
+                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(new Date(card.startTime))}">
                         &mdash;
                         <label class="visually-hidden" for="event-end-time-1">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(card.endTime)}">
+                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(new Date(card.endTime))}">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
@@ -169,4 +169,25 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export {createCardEditTemplate};
+export default class CardEdit {
+  constructor(cards) {
+    this._cards = cards;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardEditTemplate(this._cards);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

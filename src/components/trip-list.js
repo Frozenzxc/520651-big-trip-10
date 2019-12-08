@@ -1,15 +1,37 @@
-const createTripsTemplate = (cards) => {
+import {createElement} from "../util";
+
+const createTripsTemplate = (board, dayCount) => {
   return (
-    `<ul class="trip-days">
-        <li class="trip-days__item  day">
-          <div class="day__info">
-            <span class="day__counter">1</span>
-            <time class="day__date" datetime="${(cards[0].startTime)}">${(cards[0].startTime).toDateString().substr(4, 6)}</time>
-          </div>
-          <ul class="trip-events__list"></ul>
-        </li>
-    </ul>`
+    `<li class="trip-days__item  day">
+        <div class="day__info">
+          <span class="day__counter">${dayCount}</span>
+          <time class="day__date" datetime="${(new Date(board))}">${(new Date(board).toDateString().substr(4, 6))}</time>
+        </div>
+        <ul class="trip-events__list"></ul>
+      </li>`
   );
 };
 
-export {createTripsTemplate};
+export default class Trips {
+  constructor(board, dayCount) {
+    this._board = board;
+    this._dayCount = dayCount;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createTripsTemplate(this._board, this._dayCount);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
