@@ -9,7 +9,8 @@ import {
   Route,
   Card,
   CardEdit,
-  Trips
+  Trips,
+  NoCards
 } from "./components/index";
 
 const siteHeaderControls = document.querySelector(`.trip-controls`);
@@ -23,44 +24,62 @@ render(tripBoard, new Sort().getElement(), RenderPosition.AFTERBEGIN);
 
 const tripDayList = tripBoard.querySelector(`.trip-days`);
 
-const renderCard = (card, place) => {
+const renderCard = (card, container) => {
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscKey) {
+      replaceEditToCard();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  const replaceEditToCard = () => {
+    container.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
+  };
+
+  const replaceCardToEdit = () => {
+    container.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
+  };
+
   const cardComponent = new Card(card);
   const cardEditComponent = new CardEdit(card);
 
   const editButton = cardComponent.getElement().querySelector(`.event__rollup-btn`);
   editButton.addEventListener(`click`, () => {
-    place.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
+    replaceCardToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
   });
 
   const editForm = cardEditComponent.getElement();
-  editForm.addEventListener(`submit`, () => {
-    place.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
-  });
+  editForm.addEventListener(`submit`, replaceEditToCard);
 
-  render(place, cardComponent.getElement(), RenderPosition.BEFOREEND);
+  render(container, cardComponent.getElement(), RenderPosition.BEFOREEND);
 };
 
-
-let dayCount = 1;
-boards.forEach((it) => {
-  const trip = new Trips(it, dayCount);
-  render(tripDayList, trip.getElement(), RenderPosition.BEFOREEND);
-  const tripList = trip.getElement().querySelector(`.trip-events__list`);
-  cards.forEach((card) => {
-    if (card.startTime === it) {
-      renderCard(card, tripList);
-    }
+if (!cards.length) {
+  render(tripDayList, new NoCards().getElement(), RenderPosition.BEFOREEND);
+} else {
+  let dayCount = 1;
+  boards.forEach((it) => {
+    const trip = new Trips(it, dayCount);
+    render(tripDayList, trip.getElement(), RenderPosition.BEFOREEND);
+    const tripList = trip.getElement().querySelector(`.trip-events__list`);
+    cards.forEach((card) => {
+      if (card.startTime === it) {
+        renderCard(card, tripList);
+      }
+    });
+    dayCount++;
   });
-  dayCount++;
-});
 
-const tripRoute = document.querySelector(`.trip-info`);
+  const tripRoute = document.querySelector(`.trip-info`);
 
-render(tripRoute, new Route(cards).getElement(), RenderPosition.AFTERBEGIN);
+  render(tripRoute, new Route(cards).getElement(), RenderPosition.AFTERBEGIN);
 
-const tripCost = document.querySelector(`.trip-info__cost-value`);
+  const tripCost = document.querySelector(`.trip-info__cost-value`);
 
-tripCost.textContent = cards.reduce((sum, it) => {
-  return sum + parseFloat(it.price);
-}, 0);
-
+  tripCost.textContent = cards.reduce((sum, it) => {
+    return sum + parseFloat(it.price);
+  }, 0);
+}

@@ -5,6 +5,7 @@ import Route from "./route";
 import Card from "./card";
 import CardEdit from "./card-editor";
 import Trips from "./trip-list";
+import NoCards from "./no-cards";
 
 export {
   Menu,
@@ -13,5 +14,6 @@ export {
   Route,
   Card,
   CardEdit,
-  Trips
+  Trips,
+  NoCards
 };

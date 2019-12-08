@@ -99,7 +99,7 @@ const generateCards = (count) => {
 
 const CARD_COUNT = 16;
 
-const cards = generateCards(CARD_COUNT);
+let cards = generateCards(CARD_COUNT);
 
 cards.sort((a, b) => a.startTime > b.startTime ? 1 : -1);
 
