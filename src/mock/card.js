@@ -15,7 +15,7 @@ const getRandomDate = () => {
 
   targetDate.setDate(targetDate.getDate() + diffValue);
 
-  return targetDate;
+  return Date.parse(targetDate);
 };
 
 const MAX_OPTIONS = 3;
@@ -78,11 +78,13 @@ const additionalOptions = [
 ];
 
 const generateCard = () => {
+  const startTime = getRandomDate();
+  const endTime = startTime + getRandomIntegerNumber(10000000, 10000000);
   return {
     type: getRandomArrayItem(tripType),
     destination: getRandomArrayItem(destinationWaypoint),
-    startTime: getRandomDate(),
-    endTime: getRandomDate(),
+    startTime,
+    endTime,
     offers: generateOptions(additionalOptions),
     description: generateDescription(tripDescription),
     price: getRandomIntegerNumber(100, 1000)
@@ -95,10 +97,12 @@ const generateCards = (count) => {
     .map(generateCard);
 };
 
-const CARD_COUNT = 4;
+const CARD_COUNT = 16;
 
-const cards = generateCards(CARD_COUNT);
+let cards = generateCards(CARD_COUNT);
 
-cards.sort((a, b) => Date.parse(a.startTime) > Date.parse(b.startTime) ? 1 : -1);
+cards.sort((a, b) => a.startTime > b.startTime ? 1 : -1);
 
-export {cards};
+const boards = new Set(cards.map((it) => it.startTime));
+
+export {cards, boards};

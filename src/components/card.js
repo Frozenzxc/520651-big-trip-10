@@ -1,4 +1,4 @@
-import {formatTime, getDuration} from "../util";
+import {formatTime, getDuration, createElement} from "../util";
 
 const createOfferMarkup = (offers) => {
   return offers
@@ -18,6 +18,9 @@ const createCardTemplate = (card) => {
 
   const offerList = createOfferMarkup(card.offers);
 
+  const startTime = new Date(card.startTime);
+  const endTime = new Date(card.endTime);
+
   return (
     `<li class="trip-events__item">
         <div class="event">
@@ -27,11 +30,11 @@ const createCardTemplate = (card) => {
           <h3 class="event__title">${card.type} to ${card.destination}</h3>
           <div class="event__schedule">
             <p class="event__time">
-              <time class="event__start-time" datetime="${card.startTime}">${formatTime(card.startTime)}</time>
+              <time class="event__start-time" datetime="${card.startTime}">${formatTime(startTime)}</time>
               &mdash;
-              <time class="event__end-time" datetime="${card.endTime}">${formatTime(card.endTime)}</time>
+              <time class="event__end-time" datetime="${card.endTime}">${formatTime(endTime)}</time>
             </p>
-            <p class="event__duration">${getDuration(card.startTime, card.endTime)}</p>
+            <p class="event__duration">${getDuration(startTime, endTime)}</p>
           </div>
           <p class="event__price">
             &euro;&nbsp;<span class="event__price-value">${card.price}</span>
@@ -48,4 +51,25 @@ const createCardTemplate = (card) => {
   );
 };
 
-export {createCardTemplate, createOfferMarkup};
+export default class Card {
+  constructor(cards) {
+    this._cards = cards;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createCardTemplate(this._cards);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
