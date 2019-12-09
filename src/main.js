@@ -1,4 +1,4 @@
-import {cards, boards} from "./mock/card";
+import {cards, tripDates} from "./mock/card";
 import {menu} from "./mock/menu";
 import {filters} from "./mock/filter";
 import {render, RenderPosition} from "./util";
@@ -9,7 +9,7 @@ import {
   Route,
   Card,
   CardEdit,
-  Trips,
+  TripDays,
   NoCards
 } from "./components/index";
 
@@ -60,17 +60,15 @@ const renderCard = (card, container) => {
 if (!cards.length) {
   render(tripDayList, new NoCards().getElement(), RenderPosition.BEFOREEND);
 } else {
-  let dayCount = 1;
-  boards.forEach((it) => {
-    const trip = new Trips(it, dayCount);
+  Array.from(tripDates).forEach((it, index) => {
+    const trip = new TripDays(it, index + 1);
     render(tripDayList, trip.getElement(), RenderPosition.BEFOREEND);
     const tripList = trip.getElement().querySelector(`.trip-events__list`);
     cards.forEach((card) => {
-      if (card.startTime === it) {
+      if (new Date(card.startTime).toDateString() === it) {
         renderCard(card, tripList);
       }
     });
-    dayCount++;
   });
 
   const tripRoute = document.querySelector(`.trip-info`);

@@ -12,7 +12,7 @@ const createTripsTemplate = (board, dayCount) => {
   );
 };
 
-export default class Trips {
+export default class TripDays {
   constructor(board, dayCount) {
     this._board = board;
     this._dayCount = dayCount;

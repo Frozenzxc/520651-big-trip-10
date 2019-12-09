@@ -103,6 +103,6 @@ let cards = generateCards(CARD_COUNT);
 
 cards.sort((a, b) => a.startTime > b.startTime ? 1 : -1);
 
-const boards = new Set(cards.map((it) => it.startTime));
+const tripDates = new Set(cards.map((it) => new Date(it.startTime).toDateString()));
 
-export {cards, boards};
+export {cards, tripDates};
