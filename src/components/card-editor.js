@@ -1,11 +1,12 @@
-import {createElement, formatDate} from "../util";
+import {formatDate} from "../utils/common";
+import AbstractComponent from "./abstract-component";
 
 const createOfferMarkup = (offers) => {
   return offers
     .map(({type, name, price, isChecked}) => {
       return (
         `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-${type}" 
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-${type}"
             ${isChecked ? `checked` : ``}>
             <label class="event__offer-label" for="event-offer-${type}-1">
                 <span class="event__offer-title">${name}</span>
@@ -169,25 +170,17 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit {
+export default class CardEdit extends AbstractComponent {
   constructor(cards) {
+    super();
     this._cards = cards;
-    this._element = null;
   }
 
   getTemplate() {
     return createCardEditTemplate(this._cards);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }
