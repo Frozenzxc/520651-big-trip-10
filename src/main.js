@@ -17,11 +17,9 @@ render(siteHeaderControls, new Filter(filters), RenderPosition.BEFOREEND);
 
 const tripBoard = document.querySelector(`.trip-events`);
 
-render(tripBoard, new Sort(), RenderPosition.AFTERBEGIN);
+render(tripBoard, new Sort(), RenderPosition.BEFOREEND);
 
-const tripDayList = tripBoard.querySelector(`.trip-days`);
-
-const trip = new TripController(tripDayList);
+const trip = new TripController(tripBoard);
 
 trip.render(cards);
 
