@@ -7,6 +7,7 @@ import CardEdit from "./card-editor";
 import TripDays from "./trip-days";
 import NoCards from "./no-cards";
 import TripList from "./trip-list";
+import {SortType} from "./sort";
 
 export {
   Menu,
@@ -17,5 +18,6 @@ export {
   CardEdit,
   TripDays,
   NoCards,
-  TripList
+  TripList,
+  SortType
 };

@@ -5,7 +5,7 @@ const createTripsTemplate = (board, dayCount) => {
     `<li class="trip-days__item  day">
         <div class="day__info">
           <span class="day__counter">${dayCount}</span>
-          <time class="day__date" datetime="${(new Date(board))}">${(new Date(board).toDateString().substr(4, 6))}</time>
+          <time class="day__date" datetime="${board ? (new Date(board)) : ``}">${board ? (new Date(board).toDateString().substr(4, 6)) : ` `}</time>
         </div>
         <ul class="trip-events__list"></ul>
       </li>`

@@ -4,7 +4,6 @@ import {filters} from "./mock/filter";
 import {render, RenderPosition} from "./utils/render";
 import {
   Menu,
-  Sort,
   Filter,
   Route
 } from "./components/index";
@@ -16,8 +15,6 @@ render(siteHeaderControls, new Menu(menu), RenderPosition.BEFOREEND);
 render(siteHeaderControls, new Filter(filters), RenderPosition.BEFOREEND);
 
 const tripBoard = document.querySelector(`.trip-events`);
-
-render(tripBoard, new Sort(), RenderPosition.BEFOREEND);
 
 const trip = new TripController(tripBoard);
 

@@ -27,6 +27,9 @@ const getDuration = (start, end) => {
     duration.hours = duration.hours - 1;
     duration.minutes += 60;
   }
+  if (duration.hours < 0) {
+    duration.hours = Math.abs(duration.hours);
+  }
   return duration.hours + `H` + ` ` + duration.minutes + `M`;
 };
 
