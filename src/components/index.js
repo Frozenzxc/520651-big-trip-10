@@ -4,8 +4,9 @@ import Filter from "./filter";
 import Route from "./route";
 import Card from "./card";
 import CardEdit from "./card-editor";
-import Trips from "./trip-list";
+import TripDays from "./trip-days";
 import NoCards from "./no-cards";
+import TripList from "./trip-list";
 
 export {
   Menu,
@@ -14,6 +15,7 @@ export {
   Route,
   Card,
   CardEdit,
-  Trips,
-  NoCards
+  TripDays,
+  NoCards,
+  TripList
 };

@@ -1,37 +1,12 @@
-import {createElement} from "../util";
+import AbstractComponent from "./abstract-component";
 
-const createTripsTemplate = (board, dayCount) => {
-  return (
-    `<li class="trip-days__item  day">
-        <div class="day__info">
-          <span class="day__counter">${dayCount}</span>
-          <time class="day__date" datetime="${(new Date(board))}">${(new Date(board).toDateString().substr(4, 6))}</time>
-        </div>
-        <ul class="trip-events__list"></ul>
-      </li>`
-  );
+const createTripListTemplate = () => {
+
+  return (`<ul class="trip-days"></ul>`);
 };
 
-export default class Trips {
-  constructor(board, dayCount) {
-    this._board = board;
-    this._dayCount = dayCount;
-    this._element = null;
-  }
-
+export default class TripList extends AbstractComponent {
   getTemplate() {
-    return createTripsTemplate(this._board, this._dayCount);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return createTripListTemplate();
   }
 }
