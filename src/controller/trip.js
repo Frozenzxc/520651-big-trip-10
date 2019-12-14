@@ -102,7 +102,7 @@ export default class TripController {
       if (sortType === SortType.DEFAULT) {
         renderCardsByDays(tripList, sortedCards);
       }
-      const trip = new TripDays(0, 1);
+      const trip = new TripDays();
       render(tripList.getElement(), trip, RenderPosition.BEFOREEND);
       const tripEventsList = trip.getElement().querySelector(`.trip-events__list`);
       renderCards(sortedCards, tripEventsList);
