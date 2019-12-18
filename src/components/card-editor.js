@@ -1,5 +1,5 @@
 import {formatDate} from "../utils/common";
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abstract-smart-component";
 
 const createOfferMarkup = (offers) => {
   return offers
@@ -16,11 +16,10 @@ const createOfferMarkup = (offers) => {
             </div>`
       );
     })
-    .join(`\n`);
+.join(`\n`);
 };
 
 const createCardEditTemplate = (card) => {
-
   const offerList = createOfferMarkup(card.offers);
   return (
     `<form class="event  event--edit" action="#" method="post">
@@ -128,7 +127,7 @@ const createCardEditTemplate = (card) => {
                       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                       <button class="event__reset-btn" type="reset">Delete</button>
 
-                      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+                      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${card.isFavorite ? `checked` : ``}>
                       <label class="event__favorite-btn" for="event-favorite-1">
                         <span class="visually-hidden">Add to favorite</span>
                         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -170,17 +169,53 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit extends AbstractComponent {
-  constructor(cards) {
+export default class CardEdit extends AbstractSmartComponent {
+  constructor(card) {
     super();
-    this._cards = cards;
+    this._card = card;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createCardEditTemplate(this._cards);
+    return createCardEditTemplate(this._card);
+  }
+
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-group`)
+      .addEventListener(`change`, (evt) => {
+        this._card.type = evt.target.value;
+        this.rerender();
+      });
+
+    element.querySelector(`.event__input--destination`)
+      .addEventListener(`change`, (evt) => {
+        this._card.destination = evt.target.value;
+
+        this.rerender();
+      });
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`)
+      .addEventListener(`change`, handler);
+  }
+
+  reset() {
+    this.rerender();
   }
 }
