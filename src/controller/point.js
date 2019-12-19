@@ -17,6 +17,8 @@ export default class PointController extends AbstractComponent {
     this._mode = Mode.DEFAULT;
     this._cardComponent = null;
     this._cardEditComponent = null;
+
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
   render(card) {
@@ -28,12 +30,14 @@ export default class PointController extends AbstractComponent {
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
-    this._cardEditComponent.setSubmitHandler(this._replaceEditToCard);
+    this._cardEditComponent.setEditCloseButtonClickHandler(() => {
+      this._replaceEditToCard();
+      document.addEventListener(`keydown`, this._onEscKeyDown);
+    });
 
-    this._cardEditComponent.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, card, Object.assign({}, card, {
-        isFavorite: !card.isFavorite,
-      }));
+    this._cardEditComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      this._replaceEditToCard();
     });
 
     render(this._container, this._cardComponent, RenderPosition.BEFOREEND);

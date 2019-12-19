@@ -36,37 +36,37 @@ const createCardEditTemplate = (card) => {
                             <legend class="visually-hidden">Transfer</legend>
 
                             <div class="event__type-item">
-                              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi">
+                              <input id="event-type-taxi-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="taxi" ${card.type === `taxi` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--taxi" for="event-type-taxi-1">Taxi</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus">
+                              <input id="event-type-bus-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="bus" ${card.type === `bus` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--bus" for="event-type-bus-1">Bus</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train">
+                              <input id="event-type-train-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="train" ${card.type === `train` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--train" for="event-type-train-1">Train</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
+                              <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship" ${card.type === `ship` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
+                              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport" ${card.type === `transport` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive">
+                              <input id="event-type-drive-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="drive" ${card.type === `drive` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--drive" for="event-type-drive-1">Drive</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+                              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" ${card.type === `flight` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
                             </div>
                           </fieldset>
@@ -75,17 +75,17 @@ const createCardEditTemplate = (card) => {
                             <legend class="visually-hidden">Activity</legend>
 
                             <div class="event__type-item">
-                              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in">
+                              <input id="event-type-check-in-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="check-in" ${card.type === `check-in` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--check-in" for="event-type-check-in-1">Check-in</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing">
+                              <input id="event-type-sightseeing-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="sightseeing" ${card.type === `sightseeing` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--sightseeing" for="event-type-sightseeing-1">Sightseeing</label>
                             </div>
 
                             <div class="event__type-item">
-                              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant">
+                              <input id="event-type-restaurant-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="restaurant" ${card.type === `restaurant` ? `checked` : ``}>
                               <label class="event__type-label  event__type-label--restaurant" for="event-type-restaurant-1">Restaurant</label>
                             </div>
                           </fieldset>
@@ -192,15 +192,23 @@ export default class CardEdit extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
-    element.querySelector(`.event__type-group`)
+    element.querySelector(`.event__type-list`)
       .addEventListener(`change`, (evt) => {
         this._card.type = evt.target.value;
+
         this.rerender();
       });
 
     element.querySelector(`.event__input--destination`)
       .addEventListener(`change`, (evt) => {
         this._card.destination = evt.target.value;
+
+        this.rerender();
+      });
+
+    element.querySelector(`.event__favorite-checkbox`)
+      .addEventListener(`change`, () => {
+        this._card.isFavorite = !this._card.isFavorite;
 
         this.rerender();
       });
@@ -212,7 +220,12 @@ export default class CardEdit extends AbstractSmartComponent {
 
   setFavoritesButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`)
-      .addEventListener(`change`, handler);
+      .addEventListener(`click`, handler);
+  }
+
+  setEditCloseButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 
   reset() {
