@@ -1,4 +1,4 @@
-import {formatDate} from "../utils/common";
+import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
 
 const createOfferMarkup = (offers) => {
@@ -108,12 +108,12 @@ const createCardEditTemplate = (card) => {
                         <label class="visually-hidden" for="event-start-time-1">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(new Date(card.startTime))}">
+                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${card.startTime}">
                         &mdash;
                         <label class="visually-hidden" for="event-end-time-1">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(new Date(card.endTime))}">
+                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${card.endTime}">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
@@ -173,7 +173,9 @@ export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._flatpickr = null;
 
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -187,6 +189,30 @@ export default class CardEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+    const startTimeElement = this.getElement().querySelector(`#event-start-time-1`);
+    this._flatpickr = flatpickr(startTimeElement, {
+      allowInput: true,
+      enableTime: true,
+      dateFormat: `d/m/Y H:i`,
+      defaultDate: this._card.startTime,
+    });
+
+    const endTimeElement = this.getElement().querySelector(`#event-end-time-1`);
+    this._flatpickr = flatpickr(endTimeElement, {
+      allowInput: true,
+      enableTime: true,
+      dateFormat: `d/m/Y H:i`,
+      defaultDate: this._card.endTime,
+    });
   }
 
   _subscribeOnEvents() {
@@ -216,11 +242,6 @@ export default class CardEdit extends AbstractSmartComponent {
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
-  }
-
-  setFavoritesButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-checkbox`)
-      .addEventListener(`click`, handler);
   }
 
   setEditCloseButtonClickHandler(handler) {

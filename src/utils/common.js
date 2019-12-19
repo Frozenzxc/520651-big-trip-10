@@ -1,36 +1,28 @@
-const castTimeFormat = (value) => {
-  return value < 10 ? `0${value}` : String(value);
-};
+import moment from "moment";
+
+const HOUR_PER_MS = 3600000;
+const DAY_PER_MS = 86400000;
 
 const formatTime = (date) => {
-  const hours = castTimeFormat(date.getHours() % 12);
-  const minutes = castTimeFormat(date.getMinutes());
-
-  return `${hours}:${minutes}`;
+  return moment(date).format(`HH:mm`);
 };
 
-const formatDate = (date) => {
-  const years = castTimeFormat(date.getFullYear());
-  const months = castTimeFormat(date.getMonth());
-  const days = castTimeFormat(date.getDate());
-  const hours = castTimeFormat(date.getHours() % 12);
-  const minutes = castTimeFormat(date.getMinutes());
-
-  return `${days}/${months}/${years.substr(-2)} ${hours}:${minutes}`;
+const setDateTimeAttr = (date) => {
+  return moment(date).format(moment.HTML5_FMT.DATETIME_LOCAL);
 };
 
 const getDuration = (start, end) => {
-  let duration = {};
-  duration.hours = end.getHours() - start.getHours();
-  duration.minutes = end.getMinutes() - start.getMinutes();
-  if (duration.minutes < 0) {
-    duration.hours = duration.hours - 1;
-    duration.minutes += 60;
+  let startTime = moment(start);
+  let endTime = moment(end);
+  const diff = endTime.diff(startTime);
+
+  if (diff < HOUR_PER_MS) {
+    return moment(diff).format(`mm`) + `M`;
+  } else if (diff < DAY_PER_MS) {
+    return moment(diff).format(`HH`) + `H` + ` ` + moment(diff).format(`mm`) + `M`;
+  } else {
+    return moment(diff).format(`DD`) + `D` + ` ` + moment(diff).format(`HH`) + `H` + ` ` + moment(diff).format(`mm`) + `M`;
   }
-  if (duration.hours < 0) {
-    duration.hours = Math.abs(duration.hours);
-  }
-  return duration.hours + `H` + ` ` + duration.minutes + `M`;
 };
 
-export {formatTime, getDuration, formatDate};
+export {formatTime, getDuration, setDateTimeAttr};

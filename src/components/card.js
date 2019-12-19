@@ -1,4 +1,4 @@
-import {formatTime, getDuration} from "../utils/common";
+import {formatTime, getDuration, setDateTimeAttr} from "../utils/common";
 import AbstractComponent from "./abstract-component";
 
 const createOfferMarkup = (offers) => {
@@ -19,9 +19,6 @@ const createCardTemplate = (card) => {
 
   const offerList = createOfferMarkup(card.offers);
 
-  const startTime = new Date(card.startTime);
-  const endTime = new Date(card.endTime);
-
   return (
     `<li class="trip-events__item">
         <div class="event">
@@ -31,11 +28,11 @@ const createCardTemplate = (card) => {
           <h3 class="event__title">${card.type} to ${card.destination}</h3>
           <div class="event__schedule">
             <p class="event__time">
-              <time class="event__start-time" datetime="${card.startTime}">${formatTime(startTime)}</time>
+              <time class="event__start-time" datetime="${setDateTimeAttr(card.startTime)}">${formatTime(card.startTime)}</time>
               &mdash;
-              <time class="event__end-time" datetime="${card.endTime}">${formatTime(endTime)}</time>
+              <time class="event__end-time" datetime="${setDateTimeAttr(card.endTime)}">${formatTime(card.endTime)}</time>
             </p>
-            <p class="event__duration">${getDuration(startTime, endTime)}</p>
+            <p class="event__duration">${getDuration(card.startTime, card.endTime)}</p>
           </div>
           <p class="event__price">
             &euro;&nbsp;<span class="event__price-value">${card.price}</span>
