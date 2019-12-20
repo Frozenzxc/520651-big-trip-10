@@ -1,7 +1,5 @@
-import {render, RenderPosition, replace} from "../utils/render";
+import {render, RenderPosition} from "../utils/render";
 import {
-  Card,
-  CardEdit,
   NoCards,
   TripDays,
   TripList,
@@ -9,78 +7,63 @@ import {
 } from "../components/index";
 import {SortType} from "../components/index";
 import {tripDates} from "../mock/card";
-
-const renderCard = (card, container) => {
-  const onEscKeyDown = (evt) => {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscKey) {
-      replaceEditToCard();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-
-  const replaceEditToCard = () => {
-    replace(cardComponent, cardEditComponent);
-  };
-
-  const replaceCardToEdit = () => {
-    replace(cardEditComponent, cardComponent);
-  };
-
-  const cardComponent = new Card(card);
-  const cardEditComponent = new CardEdit(card);
-
-  cardComponent.setEditButtonClickHandler(() => {
-    replaceCardToEdit();
-    document.addEventListener(`keydown`, onEscKeyDown);
-  });
-
-  cardEditComponent.setSubmitHandler(replaceEditToCard);
-
-  render(container, cardComponent, RenderPosition.BEFOREEND);
-};
+import PointController from "./point";
 
 const filterCardByEventDate = (cards, tripDate) => {
   return cards.filter((card) => new Date(card.startTime).toDateString() === tripDate);
 };
 
-const renderCards = (cards, tripEventList) => {
-  cards.forEach((card) => {
-    renderCard(card, tripEventList);
+const renderCards = (tripEventList, cards, onDataChange, onViewChange) => {
+  return cards.map((card) => {
+    const pointController = new PointController(tripEventList, onDataChange, onViewChange);
+    pointController.render(card);
+
+    return pointController;
   });
 };
 
-const renderCardsByDays = (container, cards) => {
+const renderCardsByDays = (container, cards, onDataChange, onViewChange) => {
+  let controllers = [];
   Array.from(tripDates).forEach((it, index) => {
     const trip = new TripDays(it, index + 1);
     render(container.getElement(), trip, RenderPosition.BEFOREEND);
     const tripEventsList = trip.getElement().querySelector(`.trip-events__list`);
     filterCardByEventDate(cards, it).forEach((card) => {
-      renderCard(card, tripEventsList);
+      const pointController = new PointController(tripEventsList, onDataChange, onViewChange);
+      pointController.render(card);
+
+      controllers.push(pointController);
+      return controllers;
     });
   });
+  return controllers;
 };
 
 export default class TripController {
   constructor(container) {
     this._container = container;
-
+    this._cards = [];
+    this._pointControllers = [];
     this._noCards = new NoCards();
     this._sort = new Sort();
+
+    this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(cards) {
-    const container = this._container;
+    this._cards = cards;
     const tripList = new TripList();
 
     if (!cards.length) {
-      render(container, this._noCards, RenderPosition.BEFOREEND);
+      render(this._container, this._noCards, RenderPosition.BEFOREEND);
     }
-    render(container, this._sort, RenderPosition.BEFOREEND);
-    render(container, tripList, RenderPosition.BEFOREEND);
-    renderCardsByDays(tripList, cards);
+    render(this._container, this._sort, RenderPosition.BEFOREEND);
+    render(this._container, tripList, RenderPosition.BEFOREEND);
 
+    const allCards = renderCardsByDays(tripList, cards, this._onDataChange, this._onViewChange);
+
+    this._pointControllers = this._pointControllers.concat(allCards);
 
     this._sort.setSortTypeChangeHandler((sortType) => {
       let sortedCards = [];
@@ -100,12 +83,28 @@ export default class TripController {
       tripList.getElement().innerHTML = ``;
 
       if (sortType === SortType.DEFAULT) {
-        renderCardsByDays(tripList, sortedCards);
+        renderCardsByDays(tripList, sortedCards, this._onDataChange, this._onViewChange);
       }
       const trip = new TripDays();
       render(tripList.getElement(), trip, RenderPosition.BEFOREEND);
       const tripEventsList = trip.getElement().querySelector(`.trip-events__list`);
-      renderCards(sortedCards, tripEventsList);
+      renderCards(tripEventsList, sortedCards, this._onDataChange, this._onViewChange);
     });
+  }
+
+  _onDataChange(pointController, oldData, newData) {
+    const index = this._cards.findIndex((it) => it === oldData);
+
+    if (index === -1) {
+      return;
+    }
+
+    this._cards = [].concat(this._cards.slice(0, index), newData, this._cards.slice(index + 1));
+
+    pointController.render(this._cards[index]);
+  }
+
+  _onViewChange() {
+    this._pointControllers.forEach((it) => it.setDefaultView());
   }
 }

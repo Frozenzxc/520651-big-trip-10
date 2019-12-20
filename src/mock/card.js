@@ -87,7 +87,8 @@ const generateCard = () => {
     endTime,
     offers: generateOptions(additionalOptions),
     description: generateDescription(tripDescription),
-    price: getRandomIntegerNumber(100, 1000)
+    price: getRandomIntegerNumber(100, 1000),
+    isFavorite: Math.random() > 0.5
   };
 };
 
