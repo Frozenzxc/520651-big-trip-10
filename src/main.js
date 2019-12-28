@@ -8,6 +8,10 @@ import {
   Route
 } from "./components/index";
 import TripController from "./controller/trip";
+import PointModel from "./models/points";
+
+const pointModel = new PointModel();
+pointModel.setPoints(cards);
 
 const siteHeaderControls = document.querySelector(`.trip-controls`);
 
@@ -16,9 +20,9 @@ render(siteHeaderControls, new Filter(filters), RenderPosition.BEFOREEND);
 
 const tripBoard = document.querySelector(`.trip-events`);
 
-const trip = new TripController(tripBoard);
+const trip = new TripController(tripBoard, pointModel);
 
-trip.render(cards);
+trip.render();
 
 const tripRoute = document.querySelector(`.trip-info`);
 

@@ -81,6 +81,7 @@ const generateCard = () => {
   const startTime = getRandomDate();
   const endTime = startTime + getRandomIntegerNumber(10000000, 10000000);
   return {
+    id: String(new Date() + Math.random()),
     type: getRandomArrayItem(tripType),
     destination: getRandomArrayItem(destinationWaypoint),
     startTime,
