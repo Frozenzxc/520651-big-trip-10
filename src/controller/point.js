@@ -53,6 +53,8 @@ export default class PointController extends AbstractComponent {
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
+      const data = this._cardEditComponent.getData();
+      this._onDataChange(this, card, data);
       this._replaceEditToCard();
     });
 

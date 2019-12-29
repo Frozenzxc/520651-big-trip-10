@@ -1,5 +1,6 @@
 import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
+import moment from "moment";
 
 const createOfferMarkup = (offers) => {
   return offers
@@ -169,6 +170,20 @@ const createCardEditTemplate = (card) => {
   );
 };
 
+const parseFormData = (formData) => {
+  const now = new Date().toDateString();
+  const startTime = formData.get(`event-start-time`) ? Date.parse(moment(formData.get(`event-start-time`), `DD-MM-YYYY LT`).format()) : Date.parse(now);
+  const endTime = formData.get(`event-end-time`) ? Date.parse(moment(formData.get(`event-end-time`), `DD-MM-YYYY LT`).format()) : Date.parse(now);
+  return {
+    type: formData.get(`event-type`),
+    destination: formData.get(`event-destination`),
+    startTime,
+    endTime,
+    offers: [],
+    price: Math.round(Math.random() * 1000),
+  };
+};
+
 export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
@@ -197,6 +212,13 @@ export default class CardEdit extends AbstractSmartComponent {
     super.rerender();
 
     this._applyFlatpickr();
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+    return parseFormData(formData);
   }
 
   _applyFlatpickr() {

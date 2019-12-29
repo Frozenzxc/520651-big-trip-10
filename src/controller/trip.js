@@ -9,35 +9,27 @@ import {SortType} from "../components/index";
 import PointController, {EmptyCard, Mode as PointControllerMode} from "./point";
 import {getTripDates} from "../utils/common";
 
-const filterCardByEventDate = (cards, tripDate) => {
-  return cards.filter((card) => new Date(card.startTime).toDateString() === tripDate);
-};
-
-const renderCards = (container, cards, onDataChange, onViewChange, dates, mode, isSortedByDefault = true) => {
+const renderCards = (container, cards, onDataChange, onViewChange, dates, mode, isSortedByDefault) => {
   let controllers = [];
-  if (isSortedByDefault) {
-    Array.from(dates).forEach((it, index) => {
-      const trip = new TripDays(it, index + 1);
-      render(container.getElement(), trip, RenderPosition.BEFOREEND);
-      const tripEventsList = trip.getElement().querySelector(`.trip-events__list`);
-      filterCardByEventDate(cards, it).forEach((card) => {
-        const pointController = new PointController(tripEventsList, onDataChange, onViewChange);
+
+  const tripDates = isSortedByDefault ? [...getTripDates(cards)] : [true];
+
+  tripDates.forEach((it, index) => {
+    const day = isSortedByDefault ? new TripDays(it, index + 1) : new TripDays();
+
+    cards
+      .filter((card) => {
+        return isSortedByDefault ? new Date(card.startTime).toDateString() === it : card;
+      })
+      .forEach((card) => {
+        const pointController = new PointController(day.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange);
         pointController.render(card, mode);
 
         controllers.push(pointController);
       });
-    });
-  } else {
-    cards.forEach((card) => {
-      const trip = new TripDays();
-      render(container.getElement(), trip, RenderPosition.BEFOREEND);
-      const tripEventsList = trip.getElement().querySelector(`.trip-events__list`);
-      const pointController = new PointController(tripEventsList, onDataChange, onViewChange);
-      pointController.render(card, mode);
+    render(container.getElement(), day, RenderPosition.BEFOREEND);
+  });
 
-      controllers.push(pointController);
-    });
-  }
   return controllers;
 };
 
@@ -48,6 +40,7 @@ export default class TripController {
 
     this._showedCardControllers = [];
     this._creatingCard = null;
+    this._isSortedByDefault = true;
 
     this._noCards = new NoCards();
     this._sort = new Sort();
@@ -79,10 +72,7 @@ export default class TripController {
       return;
     }
 
-    const trip = new TripDays();
-    render(this._container.querySelector(`.trip-days`), trip, RenderPosition.AFTERBEGIN);
-    const tripEventsList = trip.getElement().querySelector(`.trip-events__list`);
-    this._creatingCard = new PointController(tripEventsList, this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(this._container.querySelector(`.trip-events__list`), this._onDataChange, this._onViewChange);
     this._creatingCard.render(EmptyCard, PointControllerMode.ADDING);
   }
 
@@ -119,24 +109,24 @@ export default class TripController {
   _onSortTypeChange(sortType) {
     let sortedCards = [];
     const cards = this._pointModel.getPoints();
-    let isSortedByDefault = true;
+
     switch (sortType) {
       case SortType.TIME:
-        isSortedByDefault = false;
+        this._isSortedByDefault = false;
         sortedCards = cards.slice().sort((a, b) => (b.endTime - b.startTime) - (a.endTime - a.startTime));
         break;
       case SortType.PRICE:
-        isSortedByDefault = false;
+        this._isSortedByDefault = false;
         sortedCards = cards.slice().sort((a, b) => b.price - a.price);
         break;
       case SortType.DEFAULT:
-        isSortedByDefault = true;
+        this._isSortedByDefault = true;
         sortedCards = cards.slice();
         break;
     }
 
     this._removeCards();
-    this._renderCards(sortedCards, isSortedByDefault);
+    this._renderCards(sortedCards, this._isSortedByDefault);
   }
 
   _removeCards() {
@@ -145,9 +135,9 @@ export default class TripController {
     this._showedCardControllers = [];
   }
 
-  _renderCards(cards, isSortedByDefault = true) {
+  _renderCards(cards) {
     const dates = getTripDates(cards);
-    const newCards = renderCards(this._tripList, cards, this._onDataChange, this._onViewChange, dates, PointControllerMode.DEFAULT, isSortedByDefault);
+    const newCards = renderCards(this._tripList, cards, this._onDataChange, this._onViewChange, dates, PointControllerMode.DEFAULT, this._isSortedByDefault);
     this._showedCardControllers = this._showedCardControllers.concat(newCards);
   }
 
