@@ -88,9 +88,13 @@ export default class PointController extends AbstractComponent {
   }
 
   _replaceEditToCard() {
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+
     this._cardEditComponent.reset();
 
-    replace(this._cardComponent, this._cardEditComponent);
+    if (document.contains(this._cardEditComponent.getElement())) {
+      replace(this._cardComponent, this._cardEditComponent);
+    }
     this._mode = Mode.DEFAULT;
   }
 

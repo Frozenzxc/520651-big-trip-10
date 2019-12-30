@@ -9,7 +9,7 @@ import {SortType} from "../components/index";
 import PointController, {EmptyCard, Mode as PointControllerMode} from "./point";
 import {getTripDates} from "../utils/common";
 
-const renderCards = (container, cards, onDataChange, onViewChange, dates, mode, isSortedByDefault) => {
+const renderCards = (container, cards, onDataChange, onViewChange, mode, isSortedByDefault) => {
   let controllers = [];
 
   const tripDates = isSortedByDefault ? [...getTripDates(cards)] : [true];
@@ -49,8 +49,10 @@ export default class TripController {
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._onPointDataChange = this._onPointDataChange.bind(this);
 
     this._pointModel.setFilterChangeHandler(this._onFilterChange);
+    this._pointModel.setDataChangeHandler(this._onPointDataChange);
   }
 
   render() {
@@ -62,7 +64,14 @@ export default class TripController {
     render(this._container, this._sort, RenderPosition.BEFOREEND);
     render(this._container, this._tripList, RenderPosition.BEFOREEND);
 
-    this._renderCards(cards);
+    this._showedCardControllers = renderCards(
+        this._tripList,
+        this._pointModel.getPoints(),
+        this._onDataChange,
+        this._onViewChange,
+        PointControllerMode.DEFAULT,
+        this._isSortedByDefault
+    );
 
     this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
   }
@@ -72,7 +81,7 @@ export default class TripController {
       return;
     }
 
-    this._creatingCard = new PointController(this._container.querySelector(`.trip-events__list`), this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(this._container, this._onDataChange, this._onViewChange);
     this._creatingCard.render(EmptyCard, PointControllerMode.ADDING);
   }
 
@@ -84,16 +93,12 @@ export default class TripController {
         this._updateCards();
       } else {
         this._pointModel.addPoint(newData);
-        pointController.render(newData, PointControllerMode.DEFAULT);
-
-        const destroyedCard = this._showedCardControllers.pop();
-        destroyedCard.destroy();
 
         this._showedCardControllers = [].concat(pointController, this._showedCardControllers);
+        this._updateCards();
       }
     } else if (newData === null) {
       this._pointModel.removePoint(oldData.id);
-      this._updateCards();
     } else {
       const isSuccess = this._pointModel.updatePoint(oldData.id, newData);
       if (isSuccess) {
@@ -126,7 +131,14 @@ export default class TripController {
     }
 
     this._removeCards();
-    this._renderCards(sortedCards, this._isSortedByDefault);
+    this._showedCardControllers = renderCards(
+        this._tripList,
+        sortedCards,
+        this._onDataChange,
+        this._onViewChange,
+        PointControllerMode.DEFAULT,
+        this._isSortedByDefault
+    );
   }
 
   _removeCards() {
@@ -135,18 +147,23 @@ export default class TripController {
     this._showedCardControllers = [];
   }
 
-  _renderCards(cards) {
-    const dates = getTripDates(cards);
-    const newCards = renderCards(this._tripList, cards, this._onDataChange, this._onViewChange, dates, PointControllerMode.DEFAULT, this._isSortedByDefault);
-    this._showedCardControllers = this._showedCardControllers.concat(newCards);
-  }
-
   _updateCards() {
     this._removeCards();
-    this._renderCards(this._pointModel.getPoints());
+    this._showedCardControllers = renderCards(
+        this._tripList,
+        this._pointModel.getPoints(),
+        this._onDataChange,
+        this._onViewChange,
+        PointControllerMode.DEFAULT,
+        this._isSortedByDefault
+    );
   }
 
   _onFilterChange() {
+    this._updateCards();
+  }
+
+  _onPointDataChange() {
     this._updateCards();
   }
 }

@@ -108,4 +108,4 @@ cards.sort((a, b) => a.startTime > b.startTime ? 1 : -1);
 
 const tripDates = getTripDates(cards);
 
-export {cards, tripDates};
+export {cards, tripDates, generateOptions, additionalOptions, generateDescription, tripDescription};

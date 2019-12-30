@@ -1,6 +1,7 @@
 import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
 import moment from "moment";
+import {additionalOptions, generateDescription, generateOptions, tripDescription} from "../mock/card";
 
 const createOfferMarkup = (offers) => {
   return offers
@@ -140,21 +141,17 @@ const createCardEditTemplate = (card) => {
                         <span class="visually-hidden">Open event</span>
                       </button>
                     </header>
-
+                    ${offerList || card.destination ? `
                     <section class="event__details">
-
-                      <section class="event__section  event__section--offers">
+                    ${offerList ? `<section class="event__section  event__section--offers">
                         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
                         <div class="event__available-offers">
                         ${offerList}
                         </div>
-                      </section>
-
-                      <section class="event__section  event__section--destination">
+                      </section>` : ``}
+                    ${card.destination ? `<section class="event__section  event__section--destination">
                         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
                         <p class="event__destination-description">${card.description}</p>
-
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
                             <img class="event__photo" src="http://picsum.photos/300/150?r=${Math.random()}" alt="Event photo">
@@ -164,8 +161,8 @@ const createCardEditTemplate = (card) => {
                             <img class="event__photo" src="http://picsum.photos/300/150?r=${Math.random()}" alt="Event photo">
                           </div>
                         </div>
-                      </section>
-                    </section>
+                      </section>` : ``}
+                    </section>` : ``}
                   </form>`
   );
 };
@@ -180,7 +177,7 @@ const parseFormData = (formData) => {
     startTime,
     endTime,
     offers: [],
-    price: Math.round(Math.random() * 1000),
+    price: formData.get(`event-price`),
   };
 };
 
@@ -249,6 +246,7 @@ export default class CardEdit extends AbstractSmartComponent {
     element.querySelector(`.event__type-list`)
       .addEventListener(`change`, (evt) => {
         this._card.type = evt.target.value;
+        this._card.offers = generateOptions(additionalOptions);
 
         this.rerender();
       });
@@ -256,6 +254,7 @@ export default class CardEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--destination`)
       .addEventListener(`change`, (evt) => {
         this._card.destination = evt.target.value;
+        this._card.description = generateDescription(tripDescription);
 
         this.rerender();
       });
@@ -265,6 +264,11 @@ export default class CardEdit extends AbstractSmartComponent {
         this._card.isFavorite = !this._card.isFavorite;
 
         this.rerender();
+      });
+
+    element.querySelector(`.event__input--price`)
+      .addEventListener(`change`, (evt) => {
+        this._card.price = Math.round(evt.target.value);
       });
   }
 
