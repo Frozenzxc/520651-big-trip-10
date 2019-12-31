@@ -50,13 +50,13 @@ const createCardTemplate = (card) => {
 };
 
 export default class Card extends AbstractComponent {
-  constructor(cards) {
+  constructor(card) {
     super();
-    this._cards = cards;
+    this._card = card;
   }
 
   getTemplate() {
-    return createCardTemplate(this._cards);
+    return createCardTemplate(this._card);
   }
 
   setEditButtonClickHandler(handler) {

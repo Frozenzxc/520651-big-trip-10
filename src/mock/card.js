@@ -1,3 +1,5 @@
+import {getTripDates} from "../utils/common";
+
 const getRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length);
 
@@ -10,8 +12,7 @@ const getRandomIntegerNumber = (min, max) => {
 
 const getRandomDate = () => {
   const targetDate = new Date();
-  const sign = Math.random() > 0.5 ? 1 : -1;
-  const diffValue = sign * getRandomIntegerNumber(0, 7);
+  const diffValue = getRandomIntegerNumber(0, 7);
 
   targetDate.setDate(targetDate.getDate() + diffValue);
 
@@ -81,6 +82,7 @@ const generateCard = () => {
   const startTime = getRandomDate();
   const endTime = startTime + getRandomIntegerNumber(10000000, 10000000);
   return {
+    id: String(getRandomIntegerNumber(1, 1000)),
     type: getRandomArrayItem(tripType),
     destination: getRandomArrayItem(destinationWaypoint),
     startTime,
@@ -101,9 +103,8 @@ const generateCards = (count) => {
 const CARD_COUNT = 16;
 
 let cards = generateCards(CARD_COUNT);
-
 cards.sort((a, b) => a.startTime > b.startTime ? 1 : -1);
 
-const tripDates = new Set(cards.map((it) => new Date(it.startTime).toDateString()));
+const tripDates = getTripDates(cards);
 
-export {cards, tripDates};
+export {cards, tripDates, generateOptions, additionalOptions, generateDescription, tripDescription};

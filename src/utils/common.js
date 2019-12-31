@@ -25,4 +25,16 @@ const getDuration = (start, end) => {
   }
 };
 
-export {formatTime, getDuration, setDateTimeAttr};
+const getTripDates = (cards) => {
+  return new Set(cards.map((it) => new Date(it.startTime).toDateString()));
+};
+
+const isOverdueDate = (startTime, date) => {
+  return startTime < Date.parse(date);
+};
+
+const isFutureDate = (startTime, date) => {
+  return startTime >= Date.parse(date);
+};
+
+export {formatTime, getDuration, setDateTimeAttr, isOverdueDate, isFutureDate, getTripDates};
