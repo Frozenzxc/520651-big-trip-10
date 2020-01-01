@@ -188,7 +188,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._flatpickr = null;
     this._submitButtonClickHandler = null;
     this._deleteButtonClickHandler = null;
-    this._EditCloseButtonClickHandler = null;
+    this._editCloseButtonClickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -199,7 +199,7 @@ export default class CardEdit extends AbstractSmartComponent {
   }
 
   recoveryListeners() {
-    this.setEditCloseButtonClickHandler(this._EditCloseButtonClickHandler);
+    this.setEditCloseButtonClickHandler(this._editCloseButtonClickHandler);
     this.setSubmitHandler(this._submitButtonClickHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
@@ -282,7 +282,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, handler);
 
-    this._EditCloseButtonClickHandler = handler;
+    this._editCloseButtonClickHandler = handler;
   }
 
   reset() {

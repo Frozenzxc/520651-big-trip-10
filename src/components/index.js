@@ -1,4 +1,4 @@
-import Menu from "./menu";
+import Menu,{MenuItem} from "./menu";
 import Sort from "./sort";
 import Filter from "./filter";
 import Route from "./route";
@@ -8,6 +8,8 @@ import TripDays from "./trip-days";
 import NoCards from "./no-cards";
 import TripList from "./trip-list";
 import {SortType} from "./sort";
+import Statistics from "./statistics";
+import TripEvents from "./trip-events";
 
 export {
   Menu,
@@ -19,5 +21,8 @@ export {
   TripDays,
   NoCards,
   TripList,
-  SortType
+  SortType,
+  Statistics,
+  MenuItem,
+  TripEvents
 };

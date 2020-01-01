@@ -56,13 +56,14 @@ export default class TripController {
   }
 
   render() {
+    const container = this._container.getElement();
     const cards = this._pointModel.getPoints();
 
     if (!cards.length) {
-      render(this._container, this._noCards, RenderPosition.BEFOREEND);
+      render(container, this._noCards, RenderPosition.BEFOREEND);
     }
-    render(this._container, this._sort, RenderPosition.BEFOREEND);
-    render(this._container, this._tripList, RenderPosition.BEFOREEND);
+    render(container, this._sort, RenderPosition.BEFOREEND);
+    render(container, this._tripList, RenderPosition.BEFOREEND);
 
     this._showedCardControllers = renderCards(
         this._tripList,
@@ -81,8 +82,16 @@ export default class TripController {
       return;
     }
 
-    this._creatingCard = new PointController(this._container, this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(this._container.getElement(), this._onDataChange, this._onViewChange);
     this._creatingCard.render(EmptyCard, PointControllerMode.ADDING);
+  }
+
+  show() {
+    this._container.show();
+  }
+
+  hide() {
+    this._container.hide();
   }
 
   _onDataChange(pointController, oldData, newData) {
