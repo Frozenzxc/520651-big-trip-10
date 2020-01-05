@@ -5,8 +5,6 @@ const MenuItem = {
   STATS: `Stats`
 };
 
-const ACTIVE_MENU_ITEM_CLASS = `trip-tabs__btn--active`;
-
 const createMenuTemplate = () => {
 
   return (

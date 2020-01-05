@@ -1,5 +1,4 @@
 import {cards} from "./mock/card";
-import {menu} from "./mock/menu";
 import {render, RenderPosition} from "./utils/render";
 import {
   Menu,
