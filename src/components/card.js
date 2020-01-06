@@ -3,10 +3,10 @@ import AbstractComponent from "./abstract-component";
 
 const createOfferMarkup = (offers) => {
   return offers
-    .map(({name, price}) => {
+    .map(({title, price}) => {
       return (
         `<li class="event__offer">
-          <span class="event__offer-title">${name}</span>
+          <span class="event__offer-title">${title}</span>
           +
           &euro;<span class="event__offer-price">${price}</span>
          </li>`
@@ -25,7 +25,7 @@ const createCardTemplate = (card) => {
           <div class="event__type">
             <img class="event__type-icon" width="42" height="42" src="img/icons/${card.type}.png" alt="Event type icon">
           </div>
-          <h3 class="event__title">${card.type} to ${card.destination}</h3>
+          <h3 class="event__title">${card.type} to ${card.destination.name}</h3>
           <div class="event__schedule">
             <p class="event__time">
               <time class="event__start-time" datetime="${setDateTimeAttr(card.startTime)}">${formatTime(card.startTime)}</time>

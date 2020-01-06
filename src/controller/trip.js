@@ -34,9 +34,10 @@ const renderCards = (container, cards, onDataChange, onViewChange, mode, isSorte
 };
 
 export default class TripController {
-  constructor(container, pointModel) {
+  constructor(container, pointModel, api) {
     this._container = container;
     this._pointModel = pointModel;
+    this._api = api;
 
     this._showedCardControllers = [];
     this._creatingCard = null;
@@ -109,10 +110,14 @@ export default class TripController {
     } else if (newData === null) {
       this._pointModel.removePoint(oldData.id);
     } else {
-      const isSuccess = this._pointModel.updatePoint(oldData.id, newData);
-      if (isSuccess) {
-        pointController.render(newData, PointControllerMode.DEFAULT);
-      }
+      this._api.updatePoint(oldData.id, newData)
+        .then((pointModel) => {
+          const isSuccess = this._pointModel.updatePoint(oldData.id, pointModel);
+          if (isSuccess) {
+            pointController.render(pointModel, PointControllerMode.DEFAULT);
+            this._updateCards();
+          }
+        });
     }
   }
 

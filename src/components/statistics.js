@@ -41,7 +41,7 @@ const getDuration = (start, end) => {
 
 const calcTimeSpent = (cards, destination) => {
   return cards
-    .filter((it) => it.destination === destination)
+    .filter((it) => it.destination.name === destination)
     .reduce((sum, it) => sum + getDuration(it.startTime, it.endTime), 0);
 };
 
@@ -208,7 +208,7 @@ const renderTransportChart = (transportCtx, cards) => {
 
 const renderTimeSpentChart = (timeSpentCtx, cards) => {
   const destinations = cards
-    .map((card) => card.destination)
+    .map((card) => card.destination.name)
     .filter(getUniqItems);
   const data = destinations.map((destination) => {
     return {
@@ -274,7 +274,7 @@ const renderTimeSpentChart = (timeSpentCtx, cards) => {
       },
       title: {
         display: true,
-        text: `MONEY`,
+        text: `TIME SPENT`,
         fontFamily: `'Montserrat', 'Arial', 'sans-serif'`,
         fontStyle: `bold`,
         fontSize: 28,

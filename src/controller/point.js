@@ -1,6 +1,7 @@
 import AbstractComponent from "../components/abstract-component";
 import {render, RenderPosition, replace, remove} from "../utils/render";
 import {Card, CardEdit} from "../components";
+import Point from "../models/point";
 
 const Mode = {
   DEFAULT: `default`,
@@ -17,6 +18,33 @@ const EmptyCard = {
   description: ``,
   price: 0,
   isFavorite: false
+};
+
+const parseFormData = (formData) => {
+  const desc = document.querySelector(`.event__destination-description`).textContent;
+  let pictures = [];
+  document.querySelectorAll(`.event__photo`).forEach((it) => {
+    pictures.push({src: it.src, desc: it.alt});
+  });
+
+  return new Point({
+    'type': formData.get(`event-type`),
+    'destination': {
+      'name': formData.get(`event-destination`),
+      'description': desc,
+      'pictures': pictures.map((it) => {
+        return {
+          'src': `` + it.src,
+          'description': `` + it.desc,
+        };
+      }),
+    },
+    'date_from': formData.get(`event-start-time`),
+    'date_to': formData.get(`event-end-time`),
+    'offers': formData.getAll(`event-offer`),
+    'base_price': Number(formData.get(`event-price`)),
+    'is_favorite': Boolean(formData.get(`event-favorite`))
+  });
 };
 
 export default class PointController extends AbstractComponent {
@@ -53,7 +81,9 @@ export default class PointController extends AbstractComponent {
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._cardEditComponent.getData();
+      const formData = this._cardEditComponent.getData();
+      const data = parseFormData(formData);
+
       this._onDataChange(this, card, data);
       this._replaceEditToCard();
     });
