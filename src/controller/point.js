@@ -3,6 +3,8 @@ import {render, RenderPosition, replace, remove} from "../utils/render";
 import {Card, CardEdit} from "../components";
 import Point from "../models/point";
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
+
 const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
@@ -75,12 +77,26 @@ export default class PointController extends AbstractComponent {
     });
 
     this._cardEditComponent.setEditCloseButtonClickHandler(() => {
+      this._cardEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
+      const formData = this._cardEditComponent.getData();
+      const data = parseFormData(formData);
+
+      this._onDataChange(this, card, data);
       this._replaceEditToCard();
-      document.addEventListener(`keydown`, this._onEscKeyDown);
+
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
     this._cardEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
+
+      this._cardEditComponent.setData({
+        saveButtonText: `Saving...`,
+      });
+
       const formData = this._cardEditComponent.getData();
       const data = parseFormData(formData);
 
@@ -88,7 +104,13 @@ export default class PointController extends AbstractComponent {
       this._replaceEditToCard();
     });
 
-    this._cardEditComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, card, null));
+    this._cardEditComponent.setDeleteButtonClickHandler(() => {
+      this._cardEditComponent.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._onDataChange(this, card, null);
+    });
 
     switch (mode) {
       case Mode.DEFAULT:
@@ -110,6 +132,22 @@ export default class PointController extends AbstractComponent {
         break;
     }
   }
+
+  shake() {
+    this._cardEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._cardComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._cardEditComponent.getElement().style.animation = ``;
+      this._cardComponent.getElement().style.animation = ``;
+
+      this._cardEditComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
 
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {

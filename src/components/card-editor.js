@@ -2,6 +2,11 @@ import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
 import Store from "../models/store";
 
+const DefaultData = {
+  deleteButtonText: `Delete`,
+  saveButtonText: `Save`,
+};
+
 const createOfferMarkup = (card, offers) => {
   return offers
     .map(({title, price}, index) => {
@@ -19,8 +24,14 @@ const createOfferMarkup = (card, offers) => {
   .join(`\n`);
 };
 
-const createCardEditTemplate = (card) => {
+const createCardEditTemplate = (card, options = {}) => {
+  const {externalData} = options;
+
   const offerList = createOfferMarkup(card, card.offers);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
+
   return (
     `<form class="event  event--edit" action="#" method="post">
                     <header class="event__header">
@@ -124,8 +135,8 @@ const createCardEditTemplate = (card) => {
                         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${card.price}">
                       </div>
 
-                      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                      <button class="event__reset-btn" type="reset">Delete</button>
+                      <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+                      <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
 
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${card.isFavorite ? `checked` : ``}>
                       <label class="event__favorite-btn" for="event-favorite-1">
@@ -171,6 +182,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._submitButtonClickHandler = null;
     this._deleteButtonClickHandler = null;
     this._editCloseButtonClickHandler = null;
+    this._externalData = DefaultData;
     this._destinations = Store.getAllDestinations();
     this._offers = Store.getOffers();
 
@@ -180,7 +192,9 @@ export default class CardEdit extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createCardEditTemplate(this._card);
+    return createCardEditTemplate(this._card, {
+      externalData: this._externalData
+    });
   }
 
   recoveryListeners() {
@@ -195,6 +209,11 @@ export default class CardEdit extends AbstractSmartComponent {
     super.rerender();
 
     this._applyFlatpickr();
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
   }
 
   getData() {
@@ -255,6 +274,8 @@ export default class CardEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--price`)
       .addEventListener(`change`, (evt) => {
         this._card.price = Math.round(evt.target.value);
+
+        this.rerender();
       });
   }
 
