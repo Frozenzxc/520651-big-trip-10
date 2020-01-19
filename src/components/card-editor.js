@@ -1,33 +1,51 @@
 import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
 import Store from "../models/store";
+import {setDateTimeAttr} from "../utils/common";
 
 const DefaultData = {
   deleteButtonText: `Delete`,
   saveButtonText: `Save`,
 };
 
-const createOfferMarkup = (card, offers) => {
-  return offers
-    .map(({title, price}, index) => {
-      return (
-        `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${card.type}-${index + 1}" type="checkbox" name="event-offer-${card.type}">
-            <label class="event__offer-label" for="event-offer-${card.type}-${index + 1}">
-                <span class="event__offer-title">${title}</span>
-                &plus;
-                &euro;&nbsp;<span class="event__offer-price">${price}</span>
-             </label>
-            </div>`
-      );
-    })
+const createOfferMarkup = (card, offersArr) => {
+  const index = offersArr.findIndex((it) => it.type === card.type);
+
+  const offers = offersArr[index].offers;
+  card.offers.forEach((it) => {
+    const offerIndex = offersArr[index].offers.findIndex((item) => item.title === it.title);
+
+    if (offerIndex === -1) {
+      offers.push(it);
+    }
+  });
+
+  return offers.map((offer, offerIndex) => {
+    let isCheckedOffer = ``;
+    card.offers.forEach((it) => {
+      if (offer.title === it.title) {
+        isCheckedOffer = `checked`;
+        offer.price = it.price;
+      }
+    });
+    return (
+      `<div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${card.type}-${offerIndex + 1}" type="checkbox" name="event-offer-${card.type}" ${isCheckedOffer}>
+          <label class="event__offer-label" for="event-offer-${card.type}-${offerIndex + 1}">
+              <span class="event__offer-title">${offer.title}</span>
+              &plus;
+              &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+           </label>
+          </div>`
+    );
+  })
   .join(`\n`);
 };
 
 const createCardEditTemplate = (card, options = {}) => {
-  const {externalData} = options;
+  const {externalData, offers} = options;
 
-  const offerList = createOfferMarkup(card, card.offers);
+  const offerList = createOfferMarkup(card, offers);
 
   const deleteButtonText = externalData.deleteButtonText;
   const saveButtonText = externalData.saveButtonText;
@@ -107,7 +125,7 @@ const createCardEditTemplate = (card, options = {}) => {
                         <label class="event__label  event__type-output" for="event-destination-1">
                           ${card.type} at
                         </label>
-                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.destination.name}" list="destination-list-1">
+                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.destination.name ? card.destination.name : ``}" list="destination-list-1">
                         <datalist id="destination-list-1">
                           <option value="Amsterdam"></option>
                           <option value="Geneva"></option>
@@ -119,12 +137,12 @@ const createCardEditTemplate = (card, options = {}) => {
                         <label class="visually-hidden" for="event-start-time-1">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${card.startTime}">
+                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${setDateTimeAttr(card.startTime)}">
                         &mdash;
                         <label class="visually-hidden" for="event-end-time-1">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${card.endTime}">
+                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${setDateTimeAttr(card.startTime)}">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
@@ -193,7 +211,8 @@ export default class CardEdit extends AbstractSmartComponent {
 
   getTemplate() {
     return createCardEditTemplate(this._card, {
-      externalData: this._externalData
+      externalData: this._externalData,
+      offers: this._offers,
     });
   }
 
@@ -218,8 +237,11 @@ export default class CardEdit extends AbstractSmartComponent {
 
   getData() {
     const form = this.getElement();
-
-    return new FormData(form);
+    const formData = new FormData(form);
+    return {
+      form: formData,
+      offers: this._card.offers
+    };
   }
 
   _applyFlatpickr() {
@@ -277,6 +299,41 @@ export default class CardEdit extends AbstractSmartComponent {
 
         this.rerender();
       });
+
+    element.querySelector(`#event-start-time-1`)
+      .addEventListener(`change`, (evt) => {
+        this._card.startTime = evt.target.value;
+
+        this.rerender();
+      });
+
+    element.querySelector(`#event-end-time-1`)
+      .addEventListener(`change`, (evt) => {
+        this._card.endTime = evt.target.value;
+
+        this.rerender();
+      });
+
+    Array.from(element.querySelectorAll(`.event__offer-selector`))
+      .forEach((it) => {
+        it.querySelector(`.event__offer-checkbox`)
+          .addEventListener(`change`, (evt) => {
+            const title = it.querySelector(`.event__offer-title`).textContent;
+            const price = it.querySelector(`.event__offer-price`).textContent;
+            const newOffer = {
+              title,
+              price: +price
+            };
+            if (evt.target.checked) {
+              if (!this._card.offers.includes(newOffer)) {
+                this._card.offers.push(newOffer);
+              }
+            } else {
+              const index = this._card.offers.findIndex((item) => item.title === title);
+              this._card.offers = [].concat(this._card.offers.slice(0, index), this._card.offers.slice(index + 1));
+            }
+          });
+      });
   }
 
   setSubmitHandler(handler) {
@@ -302,6 +359,10 @@ export default class CardEdit extends AbstractSmartComponent {
         opt.value = it.name;
       });
     }
+  }
+
+  deleteCardCloseButton() {
+    this.getElement().querySelector(`.event__rollup-btn`).remove();
   }
 
   reset() {

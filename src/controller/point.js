@@ -2,6 +2,7 @@ import AbstractComponent from "../components/abstract-component";
 import {render, RenderPosition, replace, remove} from "../utils/render";
 import {Card, CardEdit} from "../components";
 import Point from "../models/point";
+import {formatAfterFlatpickr} from "../utils/common";
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
@@ -22,7 +23,7 @@ const EmptyCard = {
   isFavorite: false
 };
 
-const parseFormData = (formData) => {
+const parseFormData = (formData, offers) => {
   const desc = document.querySelector(`.event__destination-description`).textContent;
   let pictures = [];
   document.querySelectorAll(`.event__photo`).forEach((it) => {
@@ -41,9 +42,9 @@ const parseFormData = (formData) => {
         };
       }),
     },
-    'date_from': formData.get(`event-start-time`),
-    'date_to': formData.get(`event-end-time`),
-    'offers': formData.getAll(`event-offer`),
+    'date_from': formatAfterFlatpickr(formData.get(`event-start-time`)),
+    'date_to': formatAfterFlatpickr(formData.get(`event-end-time`)),
+    'offers': offers,
     'base_price': Number(formData.get(`event-price`)),
     'is_favorite': Boolean(formData.get(`event-favorite`))
   });
@@ -81,8 +82,8 @@ export default class PointController extends AbstractComponent {
         saveButtonText: `Saving...`,
       });
 
-      const formData = this._cardEditComponent.getData();
-      const data = parseFormData(formData);
+      const pointData = this._cardEditComponent.getData();
+      const data = parseFormData(pointData.form, pointData.offers);
 
       this._onDataChange(this, card, data);
       this._replaceEditToCard();
@@ -97,9 +98,8 @@ export default class PointController extends AbstractComponent {
         saveButtonText: `Saving...`,
       });
 
-      const formData = this._cardEditComponent.getData();
-      const data = parseFormData(formData);
-
+      const pointData = this._cardEditComponent.getData();
+      const data = parseFormData(pointData.form, pointData.offers);
       this._onDataChange(this, card, data);
       this._replaceEditToCard();
     });
@@ -129,6 +129,10 @@ export default class PointController extends AbstractComponent {
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
         render(this._container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
+        this._cardEditComponent.deleteCardCloseButton();
+        this._cardEditComponent.setData({
+          deleteButtonText: `Cancel`,
+        });
         break;
     }
   }

@@ -54,6 +54,7 @@ const API = class {
   }
 
   updatePoint(id, data) {
+    debugger;
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
