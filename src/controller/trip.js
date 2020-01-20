@@ -102,13 +102,26 @@ export default class TripController {
         pointController.destroy();
         this._updateCards();
       } else {
-        this._pointModel.addPoint(newData);
+        this._api.createPoint(newData)
+          .then((pointModel) => {
+            this._pointModel.addPoint(pointModel);
 
-        this._showedCardControllers = [].concat(pointController, this._showedCardControllers);
-        this._updateCards();
+            this._showedCardControllers = [].concat(pointController, this._showedCardControllers);
+            this._updateCards();
+          })
+          .catch(() => {
+            pointController.shake();
+          });
       }
     } else if (newData === null) {
-      this._pointModel.removePoint(oldData.id);
+      this._api.deletePoint(oldData.id)
+        .then(() => {
+          this._pointModel.removePoint(oldData.id);
+          this._updateCards();
+        })
+        .catch(() => {
+          pointController.shake();
+        });
     } else {
       this._api.updatePoint(oldData.id, newData)
         .then((pointModel) => {
@@ -117,6 +130,9 @@ export default class TripController {
             pointController.render(pointModel, PointControllerMode.DEFAULT);
             this._updateCards();
           }
+        })
+        .catch(() => {
+          pointController.shake();
         });
     }
   }

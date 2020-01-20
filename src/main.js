@@ -12,7 +12,7 @@ import FilterController from "./controller/filter";
 import {MenuItem} from "./components/index";
 import API from "./api";
 
-const AUTHORIZATION = `Basic eo0w590ik29339a`;
+const AUTHORIZATION = `Basic ad5w543ik36234a`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
 const api = new API(END_POINT, AUTHORIZATION);
