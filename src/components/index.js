@@ -10,6 +10,7 @@ import TripList from "./trip-list";
 import {SortType} from "./sort";
 import Statistics from "./statistics";
 import TripEvents from "./trip-events";
+import Price from "./price";
 
 export {
   Menu,
@@ -24,5 +25,6 @@ export {
   SortType,
   Statistics,
   MenuItem,
-  TripEvents
+  TripEvents,
+  Price
 };

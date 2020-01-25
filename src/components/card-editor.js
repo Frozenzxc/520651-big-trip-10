@@ -1,7 +1,10 @@
 import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
 import Store from "../models/store";
-import {setDateTimeAttr} from "../utils/common";
+import {setDateTimeAttr, formatCardTitle} from "../utils/common";
+import debounce from "lodash/debounce";
+
+const DEBOUNCE_TIMEOUT = 500;
 
 const DefaultData = {
   deleteButtonText: `Delete`,
@@ -123,7 +126,7 @@ const createCardEditTemplate = (card, options = {}) => {
 
                       <div class="event__field-group  event__field-group--destination">
                         <label class="event__label  event__type-output" for="event-destination-1">
-                          ${card.type} at
+                          ${formatCardTitle(card)}
                         </label>
                         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.destination.name ? card.destination.name : ``}" list="destination-list-1">
                         <datalist id="destination-list-1">
@@ -200,6 +203,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this._submitButtonClickHandler = null;
     this._deleteButtonClickHandler = null;
     this._editCloseButtonClickHandler = null;
+    this._favoriteButtonClickHandler = null;
     this._externalData = DefaultData;
     this._destinations = Store.getAllDestinations();
     this._offers = Store.getOffers();
@@ -220,6 +224,7 @@ export default class CardEdit extends AbstractSmartComponent {
     this.setEditCloseButtonClickHandler(this._editCloseButtonClickHandler);
     this.setSubmitHandler(this._submitButtonClickHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteButtonClickHandler);
     this._subscribeOnEvents();
     this.setDestinations(this._destinations);
   }
@@ -289,29 +294,21 @@ export default class CardEdit extends AbstractSmartComponent {
     element.querySelector(`.event__favorite-checkbox`)
       .addEventListener(`change`, () => {
         this._card.isFavorite = !this._card.isFavorite;
-
-        this.rerender();
       });
 
     element.querySelector(`.event__input--price`)
       .addEventListener(`change`, (evt) => {
         this._card.price = Math.round(evt.target.value);
-
-        this.rerender();
       });
 
     element.querySelector(`#event-start-time-1`)
       .addEventListener(`change`, (evt) => {
         this._card.startTime = evt.target.value;
-
-        this.rerender();
       });
 
     element.querySelector(`#event-end-time-1`)
       .addEventListener(`change`, (evt) => {
         this._card.endTime = evt.target.value;
-
-        this.rerender();
       });
 
     Array.from(element.querySelectorAll(`.event__offer-selector`))
@@ -365,6 +362,10 @@ export default class CardEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.event__rollup-btn`).remove();
   }
 
+  clearCardOffers() {
+    this.getElement().querySelector(`.event__details`).remove();
+  }
+
   reset() {
     this.rerender();
   }
@@ -374,5 +375,17 @@ export default class CardEdit extends AbstractSmartComponent {
       .addEventListener(`click`, handler);
 
     this._deleteButtonClickHandler = handler;
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`#event-favorite-1`)
+      .addEventListener(`click`, debounce(handler, DEBOUNCE_TIMEOUT));
+    const elm = this.getElement().querySelector(`#event-favorite-1`);
+    this._card.isFavorite = elm.checked;
+    this._favoriteButtonClickHandler = handler;
+  }
+
+  getFavorite() {
+    return this._card;
   }
 }

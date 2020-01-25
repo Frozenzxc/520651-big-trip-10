@@ -112,6 +112,14 @@ export default class PointController extends AbstractComponent {
       this._onDataChange(this, card, null);
     });
 
+    this._cardEditComponent.setFavoriteButtonClickHandler(() => {
+
+      const data = this._cardEditComponent.getFavorite();
+
+      this._onDataChange(this, card, data);
+      this._replaceEditToCard();
+    });
+
     switch (mode) {
       case Mode.DEFAULT:
         if (oldCardEditComponent && oldCardComponent) {
@@ -128,11 +136,12 @@ export default class PointController extends AbstractComponent {
           remove(oldCardEditComponent);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        render(this._container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
-        this._cardEditComponent.deleteCardCloseButton();
         this._cardEditComponent.setData({
           deleteButtonText: `Cancel`,
         });
+        this._cardEditComponent.deleteCardCloseButton();
+        this._cardEditComponent.clearCardOffers();
+        render(this._container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
         break;
     }
   }
@@ -152,11 +161,16 @@ export default class PointController extends AbstractComponent {
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
-
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToCard();
     }
+  }
+
+  destroy() {
+    remove(this._cardEditComponent);
+    remove(this._cardComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _replaceEditToCard() {
@@ -187,12 +201,6 @@ export default class PointController extends AbstractComponent {
       this._replaceEditToCard();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
-  }
-
-  destroy() {
-    remove(this._cardEditComponent);
-    remove(this._cardComponent);
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 }
 

@@ -1,11 +1,9 @@
 import {FilterType} from "../const";
 import {getCardsByFilter} from "../utils/filter";
-import {tripDates} from "../mock/card";
 
 export default class Points {
   constructor() {
     this._cards = [];
-    this._tripDates = Array.from(tripDates);
     this._activeFilterType = FilterType.EVERYTHING;
 
     this._filterChangeHandlers = [];
@@ -14,6 +12,10 @@ export default class Points {
 
   getPoints() {
     return getCardsByFilter(this._cards, this._activeFilterType);
+  }
+
+  getPointsByFilter(filterType) {
+    return getCardsByFilter(this._cards, filterType);
   }
 
   getPointsAll() {

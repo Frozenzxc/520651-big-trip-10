@@ -19,8 +19,10 @@ export default class FilterController {
       return {
         name: filterType,
         isChecked: filterType === this._activeFilterType,
+        isEnabled: !!this._pointModel.getPointsByFilter(filterType).length,
       };
     });
+
     const oldComponent = this._filterComponent;
 
     this._filterComponent = new Filter(filters);

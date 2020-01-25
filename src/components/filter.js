@@ -12,10 +12,10 @@ const createFilterTemplate = (filters) => {
     `<form class="trip-filters" action="#" method="get">
         <h2 class="visually-hidden">Filter events</h2>
         ${filters
-      .map(({name, isChecked}) => {
+      .map(({name, isChecked, isEnabled}) => {
         return (
           `<div class="trip-filters__filter">
-          <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name}" ${isChecked ? `checked` : ``}>
+          <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name}" ${isChecked ? `checked` : ``} ${isEnabled ? `` : `disabled`}>
           <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
         </div>`
         );
