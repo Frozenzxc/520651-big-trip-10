@@ -1,5 +1,7 @@
 import AbstractSmartComponent from "./abstract-smart-component";
 import moment from "moment";
+import Chart from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 const SHOWING_BARS_COUNT_BY_TYPE = 6;
 const SHOWING_BARS_COUNT_BY_TRANSPORT_TYPE = 4;
@@ -56,8 +58,8 @@ const renderPriceChart = (priceCtx, cards) => {
     };
   })
     .sort((a, b) => b.price - a.price);
-  return new window.Chart(priceCtx, {
-    plugins: [window.ChartDataLabels],
+  return new Chart(priceCtx, {
+    plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: data.map((it) => it.type.toUpperCase()).slice(0, SHOWING_BARS_COUNT_BY_TYPE),
@@ -93,6 +95,7 @@ const renderPriceChart = (priceCtx, cards) => {
             display: false
           },
           ticks: {
+            beginAtZero: true,
             display: false,
           }
         }],
@@ -135,8 +138,8 @@ const renderTransportChart = (transportCtx, cards) => {
     };
   })
     .sort((a, b) => b.count - a.count);
-  return new window.Chart(transportCtx, {
-    plugins: [window.ChartDataLabels],
+  return new Chart(transportCtx, {
+    plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: data.map((it) => it.type.toUpperCase()).slice(0, SHOWING_BARS_COUNT_BY_TRANSPORT_TYPE),
@@ -217,8 +220,8 @@ const renderTimeSpentChart = (timeSpentCtx, cards) => {
     };
   })
     .sort((a, b) => b.duration - a.duration);
-  return new window.Chart(timeSpentCtx, {
-    plugins: [window.ChartDataLabels],
+  return new Chart(timeSpentCtx, {
+    plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: data.map((it) => it.destination.toUpperCase()).slice(0, SHOWING_BARS_COUNT_BY_DESTINATION),

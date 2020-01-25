@@ -10,12 +10,27 @@ import TripController from "./controller/trip";
 import PointModel from "./models/points";
 import FilterController from "./controller/filter";
 import {MenuItem} from "./components/index";
-import API from "./api";
+import Api from "./api/index";
+import Backup from "./api/backup";
+import Provider from "./api/provider";
+import "flatpickr/dist/flatpickr.css";
 
+const BACKUP_PREFIX = `big-trip-cache`;
+const BACKUP_VER = `v1`;
+const BACKUP_NAME = `${BACKUP_PREFIX}-${BACKUP_VER}`;
 const AUTHORIZATION = `Basic ad5w543ik36234a`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
-const api = new API(END_POINT, AUTHORIZATION);
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {
+    }).catch(() => {
+    });
+});
+
+const api = new Api(END_POINT, AUTHORIZATION);
+const backup = new Backup(BACKUP_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, backup);
 
 const siteMenuComponent = new Menu();
 
@@ -27,7 +42,7 @@ const siteMainElement = document.querySelector(`.page-main`);
 const mainElementContainer = siteMainElement.querySelector(`.page-body__container`);
 const siteHeaderControls = document.querySelector(`.trip-controls`);
 const filterController = new FilterController(siteHeaderControls, pointModel);
-const trip = new TripController(tripEvents, pointModel, api);
+const trip = new TripController(tripEvents, pointModel, apiWithProvider);
 const tripRoute = document.querySelector(`.trip-info`);
 const tripCost = document.querySelector(`.trip-info__cost-value`);
 
@@ -63,9 +78,23 @@ siteMenuComponent.setOnClick((menuItem) => {
   }
 });
 
-api.getData()
+apiWithProvider.getData()
   .then((points) => {
     pointModel.setPoints(points);
     trip.render();
   });
 
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  if (!apiWithProvider.getSynchronize()) {
+    apiWithProvider.sync()
+      .then(() => {
+      })
+      .catch(() => {
+      });
+  }
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});
