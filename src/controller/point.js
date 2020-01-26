@@ -86,7 +86,7 @@ export default class PointController extends AbstractComponent {
       const data = parseFormData(pointData.form, pointData.offers);
 
       this._onDataChange(this, card, data);
-
+      this._cardEditComponent.activateForm();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
@@ -100,7 +100,7 @@ export default class PointController extends AbstractComponent {
       const pointData = this._cardEditComponent.getData();
       const data = parseFormData(pointData.form, pointData.offers);
       this._onDataChange(this, card, data);
-
+      this._cardEditComponent.activateForm();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
@@ -108,8 +108,9 @@ export default class PointController extends AbstractComponent {
       this._cardEditComponent.setData({
         deleteButtonText: `Deleting...`,
       });
-
+      this._cardEditComponent.disableForm();
       this._onDataChange(this, card, null);
+      this._cardEditComponent.activateForm();
     });
 
     this._cardEditComponent.setFavoriteButtonClickHandler(() => {

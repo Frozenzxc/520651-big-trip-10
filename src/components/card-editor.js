@@ -396,4 +396,12 @@ export default class CardEdit extends AbstractSmartComponent {
       elm.readOnly = true;
     });
   }
+
+  activateForm() {
+    const form = this.getElement();
+    const elements = form.elements;
+    elements.forEach((elm) => {
+      elm.readOnly = false;
+    });
+  }
 }
