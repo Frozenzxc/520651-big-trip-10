@@ -388,4 +388,12 @@ export default class CardEdit extends AbstractSmartComponent {
   getFavorite() {
     return this._card;
   }
+
+  disableForm() {
+    const form = this.getElement();
+    const elements = form.elements;
+    elements.forEach((elm) => {
+      elm.readOnly = true;
+    });
+  }
 }

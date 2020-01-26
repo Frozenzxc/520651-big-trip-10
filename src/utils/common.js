@@ -2,12 +2,13 @@ import moment from "moment";
 
 const HOUR_PER_MS = 3600000;
 const DAY_PER_MS = 86400000;
+const AUTHOROZATION_STRING_LENGTH = 15;
 
 const randomString = () => {
   let result = ``;
   const symbols = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
   const maxPosition = symbols.length - 1;
-  for (let i = 0; i < 15; ++i) {
+  for (let i = 0; i < AUTHOROZATION_STRING_LENGTH; ++i) {
     let position = Math.floor(Math.random() * maxPosition);
     result = result + symbols.substring(position, position + 1);
   }

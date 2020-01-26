@@ -81,12 +81,11 @@ export default class PointController extends AbstractComponent {
       this._cardEditComponent.setData({
         saveButtonText: `Saving...`,
       });
-
+      this._cardEditComponent.disableForm();
       const pointData = this._cardEditComponent.getData();
       const data = parseFormData(pointData.form, pointData.offers);
 
       this._onDataChange(this, card, data);
-      this._replaceEditToCard();
 
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
@@ -97,11 +96,12 @@ export default class PointController extends AbstractComponent {
       this._cardEditComponent.setData({
         saveButtonText: `Saving...`,
       });
-
+      this._cardEditComponent.disableForm();
       const pointData = this._cardEditComponent.getData();
       const data = parseFormData(pointData.form, pointData.offers);
       this._onDataChange(this, card, data);
-      this._replaceEditToCard();
+
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
     this._cardEditComponent.setDeleteButtonClickHandler(() => {
@@ -117,7 +117,6 @@ export default class PointController extends AbstractComponent {
       const data = this._cardEditComponent.getFavorite();
 
       this._onDataChange(this, card, data);
-      this._replaceEditToCard();
     });
 
     switch (mode) {
