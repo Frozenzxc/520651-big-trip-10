@@ -3,6 +3,30 @@ import moment from "moment";
 const HOUR_PER_MS = 3600000;
 const DAY_PER_MS = 86400000;
 
+const randomString = () => {
+  let result = ``;
+  const symbols = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
+  const maxPosition = symbols.length - 1;
+  for (let i = 0; i < 15; ++i) {
+    let position = Math.floor(Math.random() * maxPosition);
+    result = result + symbols.substring(position, position + 1);
+  }
+  return result;
+};
+
+const CHECKINPOINTS = [
+  `sightseeing`,
+  `restaurant`,
+  `check-in`
+];
+
+const formatCardTitle = (card) => {
+  if (CHECKINPOINTS.includes(card.type)) {
+    return `${card.type} in`;
+  }
+  return `${card.type} to`;
+};
+
 const formatTime = (date) => {
   return moment(date).format(`HH:mm`);
 };
@@ -41,4 +65,4 @@ const isFutureDate = (startTime, date) => {
   return startTime >= Date.parse(date);
 };
 
-export {formatTime, getDuration, setDateTimeAttr, isOverdueDate, isFutureDate, getTripDates, formatAfterFlatpickr};
+export {formatTime, getDuration, setDateTimeAttr, isOverdueDate, isFutureDate, getTripDates, formatAfterFlatpickr, formatCardTitle, randomString};

@@ -2,9 +2,9 @@ import AbstractComponent from "./abstract-component";
 
 const getTripRoutes = (cards) => {
   if (cards.length < 3) {
-    return cards[0].destination + ` - ` + cards[1].destination + ` - ` + cards[2].destination;
+    return cards[0].destination.name + ` - ` + cards[1].destination.name + ` - ` + cards[2].destination.name;
   }
-  return cards[0].destination + ` - ... - ` + cards[cards.length - 1].destination;
+  return cards[0].destination.name + ` - ... - ` + cards[cards.length - 1].destination.name;
 };
 
 const createRouteTemplate = (cards) => {

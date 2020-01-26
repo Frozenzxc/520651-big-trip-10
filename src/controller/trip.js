@@ -33,15 +33,25 @@ const renderCards = (container, cards, onDataChange, onViewChange, mode, isSorte
   return controllers;
 };
 
+const getTotalPrice = (cards) => {
+  return cards.reduce((sum, card) => {
+    return sum + parseFloat(card.price) + card.offers.reduce((offerCost, it) => {
+      return offerCost + parseFloat(it.price);
+    }, 0);
+  }, 0);
+};
+
 export default class TripController {
   constructor(container, pointModel, api) {
     this._container = container;
     this._pointModel = pointModel;
     this._api = api;
 
+    this._emptyCard = Object.assign({}, EmptyCard);
     this._showedCardControllers = [];
     this._creatingCard = null;
     this._isSortedByDefault = true;
+    this._totalPrice = null;
 
     this._noCards = new NoCards();
     this._sort = new Sort();
@@ -54,6 +64,8 @@ export default class TripController {
 
     this._pointModel.setFilterChangeHandler(this._onFilterChange);
     this._pointModel.setDataChangeHandler(this._onPointDataChange);
+
+    this._priceChangeHandlers = [];
   }
 
   render() {
@@ -65,6 +77,7 @@ export default class TripController {
     }
     render(container, this._sort, RenderPosition.BEFOREEND);
     render(container, this._tripList, RenderPosition.BEFOREEND);
+    this._totalPrice = getTotalPrice(cards);
 
     this._showedCardControllers = renderCards(
         this._tripList,
@@ -74,7 +87,6 @@ export default class TripController {
         PointControllerMode.DEFAULT,
         this._isSortedByDefault
     );
-
     this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
@@ -84,7 +96,7 @@ export default class TripController {
     }
 
     this._creatingCard = new PointController(this._container.getElement(), this._onDataChange, this._onViewChange);
-    this._creatingCard.render(EmptyCard, PointControllerMode.ADDING);
+    this._creatingCard.render(this._emptyCard, PointControllerMode.ADDING);
   }
 
   show() {
@@ -95,8 +107,16 @@ export default class TripController {
     this._container.hide();
   }
 
+  setPriceChangeHandler(handler) {
+    this._priceChangeHandlers.push(handler);
+  }
+
+  getTotalPrice() {
+    return this._totalPrice;
+  }
+
   _onDataChange(pointController, oldData, newData) {
-    if (oldData === EmptyCard) {
+    if (oldData === this._emptyCard) {
       this._creatingCard = null;
       if (newData === null) {
         pointController.destroy();
@@ -107,6 +127,8 @@ export default class TripController {
             this._pointModel.addPoint(pointModel);
 
             this._showedCardControllers = [].concat(pointController, this._showedCardControllers);
+
+            this._emptyCard = Object.assign({}, EmptyCard);
             this._updateCards();
           })
           .catch(() => {
@@ -117,6 +139,7 @@ export default class TripController {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointModel.removePoint(oldData.id);
+
           this._updateCards();
         })
         .catch(() => {
@@ -187,6 +210,8 @@ export default class TripController {
         PointControllerMode.DEFAULT,
         this._isSortedByDefault
     );
+    this._totalPrice = getTotalPrice(this._pointModel.getPoints());
+    this._callHandlers(this._priceChangeHandlers);
   }
 
   _onFilterChange() {
@@ -195,5 +220,9 @@ export default class TripController {
 
   _onPointDataChange() {
     this._updateCards();
+  }
+
+  _callHandlers(handlers) {
+    handlers.forEach((handler) => handler());
   }
 }
