@@ -96,7 +96,7 @@ export default class TripController {
     if (this._creatingCard) {
       return;
     }
-    //this._onViewChange();
+
     this._creatingCard = new PointController(this._tripList.getElement(), this._onDataChange, this._onViewChange);
     this._creatingCard.render(this._emptyCard, Mode.ADDING);
   }
@@ -171,11 +171,7 @@ export default class TripController {
   }
 
   _onViewChange() {
-
-    this._showedCardControllers.forEach((it) => {
-      console.log(it);
-      it.setDefaultView();
-    });
+    this._showedCardControllers.forEach((it) => it.setDefaultView());
   }
 
   _onSortTypeChange(sortType) {
