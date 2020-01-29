@@ -156,13 +156,10 @@ export default class PointController extends AbstractComponent {
 
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
+      this._cardEditComponent.resetForm();
+
       this._replaceEditToCard();
     }
-  }
-
-  replaceEditView() {
-    this._cardEditComponent.resetForm();
-    this._replaceEditToCard();
   }
 
   destroy() {

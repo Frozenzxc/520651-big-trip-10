@@ -6,7 +6,7 @@ import {
   Sort
 } from "../components/index";
 import {SortType} from "../components/index";
-import PointController, {EmptyCard, Mode as PointControllerMode} from "./point";
+import PointController, {EmptyCard, Mode} from "./point";
 import {getTripDates} from "../utils/common";
 import moment from "moment";
 
@@ -86,7 +86,7 @@ export default class TripController {
         this._pointModel.getPoints(),
         this._onDataChange,
         this._onViewChange,
-        PointControllerMode.DEFAULT,
+        Mode.DEFAULT,
         this._isSortedByDefault
     );
     this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
@@ -96,9 +96,9 @@ export default class TripController {
     if (this._creatingCard) {
       return;
     }
-
+    //this._onViewChange();
     this._creatingCard = new PointController(this._tripList.getElement(), this._onDataChange, this._onViewChange);
-    this._creatingCard.render(this._emptyCard, PointControllerMode.ADDING);
+    this._creatingCard.render(this._emptyCard, Mode.ADDING);
   }
 
   show() {
@@ -123,10 +123,6 @@ export default class TripController {
 
   getPoints() {
     return this._pointModel.getPoints();
-  }
-
-  resetBoard() {
-    this._showedCardControllers.forEach((it) => it.replaceEditView());
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -164,7 +160,7 @@ export default class TripController {
         .then((pointModel) => {
           const isSuccess = this._pointModel.updatePoint(oldData.id, pointModel);
           if (isSuccess) {
-            pointController.render(pointModel, PointControllerMode.DEFAULT);
+            pointController.render(pointModel, Mode.DEFAULT);
             this._updateCards();
           }
         })
@@ -175,7 +171,11 @@ export default class TripController {
   }
 
   _onViewChange() {
-    this._showedCardControllers.forEach((it) => it.setDefaultView());
+
+    this._showedCardControllers.forEach((it) => {
+      console.log(it);
+      it.setDefaultView();
+    });
   }
 
   _onSortTypeChange(sortType) {
@@ -203,7 +203,7 @@ export default class TripController {
         sortedCards,
         this._onDataChange,
         this._onViewChange,
-        PointControllerMode.DEFAULT,
+        Mode.DEFAULT,
         this._isSortedByDefault
     );
   }
@@ -221,7 +221,7 @@ export default class TripController {
         this._pointModel.getPoints(),
         this._onDataChange,
         this._onViewChange,
-        PointControllerMode.DEFAULT,
+        Mode.DEFAULT,
         this._isSortedByDefault
     );
     this._totalPrice = getTotalPrice(this._pointModel.getPoints());

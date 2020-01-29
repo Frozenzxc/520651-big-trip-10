@@ -105,7 +105,6 @@ export default class App {
   _setEventAddBtn() {
     const eventAddBtn = document.querySelector(`.trip-main__event-add-btn`);
     eventAddBtn.addEventListener(`click`, () => {
-      this._trip.resetBoard();
       this._trip.createCard();
     });
   }

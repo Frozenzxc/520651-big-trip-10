@@ -410,5 +410,4 @@ export default class CardEdit extends AbstractSmartComponent {
           });
       });
   }
-
 }
