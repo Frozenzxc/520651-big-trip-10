@@ -55,7 +55,7 @@ const getDuration = (start, end) => {
 };
 
 const getTripDates = (cards) => {
-  return new Set(cards.map((it) => new Date(it.startTime).toDateString()));
+  return new Set(cards.map((it) => moment(it.startTime).dayOfYear()));
 };
 
 const isOverdueDate = (startTime, date) => {

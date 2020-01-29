@@ -199,6 +199,7 @@ export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._oldCard = Object.assign({}, this._card);
     this._flatpickr = null;
     this._submitButtonClickHandler = null;
     this._deleteButtonClickHandler = null;
@@ -249,88 +250,8 @@ export default class CardEdit extends AbstractSmartComponent {
     };
   }
 
-  _applyFlatpickr() {
-    if (this._flatpickr) {
-      this._flatpickr.destroy();
-      this._flatpickr = null;
-    }
-    const startTimeElement = this.getElement().querySelector(`#event-start-time-1`);
-    this._flatpickr = flatpickr(startTimeElement, {
-      allowInput: true,
-      enableTime: true,
-      dateFormat: `d/m/Y H:i`,
-      defaultDate: this._card.startTime,
-    });
-
-    const endTimeElement = this.getElement().querySelector(`#event-end-time-1`);
-    this._flatpickr = flatpickr(endTimeElement, {
-      allowInput: true,
-      enableTime: true,
-      dateFormat: `d/m/Y H:i`,
-      defaultDate: this._card.endTime,
-    });
-  }
-
-  _subscribeOnEvents() {
-    const element = this.getElement();
-
-    element.querySelector(`.event__type-list`)
-      .addEventListener(`change`, (evt) => {
-        const index = this._offers.findIndex((it) => it.type === evt.target.value);
-        this._card.type = evt.target.value;
-        this._card.offers = this._offers[index].offers;
-
-        this.rerender();
-      });
-
-    element.querySelector(`.event__input--destination`)
-      .addEventListener(`change`, (evt) => {
-        const index = this._destinations.findIndex((it) => it.name === evt.target.value);
-        this._card.destination = this._destinations[index];
-
-        this.rerender();
-      });
-
-    element.querySelector(`.event__favorite-checkbox`)
-      .addEventListener(`change`, () => {
-        this._card.isFavorite = !this._card.isFavorite;
-      });
-
-    element.querySelector(`.event__input--price`)
-      .addEventListener(`change`, (evt) => {
-        this._card.price = Math.round(evt.target.value);
-      });
-
-    element.querySelector(`#event-start-time-1`)
-      .addEventListener(`change`, (evt) => {
-        this._card.startTime = evt.target.value;
-      });
-
-    element.querySelector(`#event-end-time-1`)
-      .addEventListener(`change`, (evt) => {
-        this._card.endTime = evt.target.value;
-      });
-
-    Array.from(element.querySelectorAll(`.event__offer-selector`))
-      .forEach((it) => {
-        it.querySelector(`.event__offer-checkbox`)
-          .addEventListener(`change`, (evt) => {
-            const title = it.querySelector(`.event__offer-title`).textContent;
-            const price = it.querySelector(`.event__offer-price`).textContent;
-            const newOffer = {
-              title,
-              price: +price
-            };
-            if (evt.target.checked) {
-              if (!this._card.offers.includes(newOffer)) {
-                this._card.offers.push(newOffer);
-              }
-            } else {
-              const index = this._card.offers.findIndex((item) => item.title === title);
-              this._card.offers = [].concat(this._card.offers.slice(0, index), this._card.offers.slice(index + 1));
-            }
-          });
-      });
+  resetForm() {
+    this._card = this._oldCard;
   }
 
   setSubmitHandler(handler) {
@@ -391,7 +312,7 @@ export default class CardEdit extends AbstractSmartComponent {
 
   disableForm() {
     const form = this.getElement();
-    const elements = form.elements;
+    const elements = Array.from(form.elements);
     elements.forEach((elm) => {
       elm.readOnly = true;
     });
@@ -399,9 +320,95 @@ export default class CardEdit extends AbstractSmartComponent {
 
   activateForm() {
     const form = this.getElement();
-    const elements = form.elements;
+    const elements = Array.from(form.elements);
     elements.forEach((elm) => {
       elm.readOnly = false;
     });
   }
+
+  _applyFlatpickr() {
+    if (this._flatpickr) {
+      this._flatpickr.destroy();
+      this._flatpickr = null;
+    }
+    const startTimeElement = this.getElement().querySelector(`#event-start-time-1`);
+    this._flatpickr = flatpickr(startTimeElement, {
+      allowInput: true,
+      enableTime: true,
+      dateFormat: `d/m/Y H:i`,
+      defaultDate: this._card.startTime,
+    });
+
+    const endTimeElement = this.getElement().querySelector(`#event-end-time-1`);
+    this._flatpickr = flatpickr(endTimeElement, {
+      allowInput: true,
+      enableTime: true,
+      dateFormat: `d/m/Y H:i`,
+      defaultDate: this._card.endTime,
+    });
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`)
+      .addEventListener(`change`, (evt) => {
+        const index = this._offers.findIndex((it) => it.type === evt.target.value);
+        this._card.type = evt.target.value;
+        this._card.offers = this._offers[index].offers;
+
+        this.rerender();
+      });
+
+    element.querySelector(`.event__input--destination`)
+      .addEventListener(`change`, (evt) => {
+        const index = this._destinations.findIndex((it) => it.name === evt.target.value);
+        this._card.destination = this._destinations[index];
+
+        this.rerender();
+      });
+
+    element.querySelector(`.event__favorite-checkbox`)
+      .addEventListener(`change`, () => {
+        this._card.isFavorite = !this._card.isFavorite;
+        this._oldCard.isFavorite = this._card.isFavorite;
+      });
+
+    element.querySelector(`.event__input--price`)
+      .addEventListener(`change`, (evt) => {
+        this._card.price = Math.round(evt.target.value);
+      });
+
+    element.querySelector(`#event-start-time-1`)
+      .addEventListener(`change`, (evt) => {
+        this._card.startTime = evt.target.value;
+      });
+
+    element.querySelector(`#event-end-time-1`)
+      .addEventListener(`change`, (evt) => {
+        this._card.endTime = evt.target.value;
+      });
+
+    Array.from(element.querySelectorAll(`.event__offer-selector`))
+      .forEach((it) => {
+        it.querySelector(`.event__offer-checkbox`)
+          .addEventListener(`change`, (evt) => {
+            const title = it.querySelector(`.event__offer-title`).textContent;
+            const price = it.querySelector(`.event__offer-price`).textContent;
+            const newOffer = {
+              title,
+              price: +price
+            };
+            if (evt.target.checked) {
+              if (!this._card.offers.includes(newOffer)) {
+                this._card.offers.push(newOffer);
+              }
+            } else {
+              const index = this._card.offers.findIndex((item) => item.title === title);
+              this._card.offers = [].concat(this._card.offers.slice(0, index), this._card.offers.slice(index + 1));
+            }
+          });
+      });
+  }
+
 }

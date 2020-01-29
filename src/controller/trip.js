@@ -8,18 +8,19 @@ import {
 import {SortType} from "../components/index";
 import PointController, {EmptyCard, Mode as PointControllerMode} from "./point";
 import {getTripDates} from "../utils/common";
+import moment from "moment";
 
 const renderCards = (container, cards, onDataChange, onViewChange, mode, isSortedByDefault) => {
   let controllers = [];
 
-  const tripDates = isSortedByDefault ? [...getTripDates(cards)] : [true];
+  const tripDates = isSortedByDefault ? [...getTripDates(cards)].sort((a, b) => a - b) : [true];
 
   tripDates.forEach((it, index) => {
-    const day = isSortedByDefault ? new TripDays(it, index + 1) : new TripDays();
+    const day = isSortedByDefault ? new TripDays(moment().dayOfYear(it), index + 1) : new TripDays();
 
     cards
       .filter((card) => {
-        return isSortedByDefault ? new Date(card.startTime).toDateString() === it : card;
+        return isSortedByDefault ? moment(card.startTime).dayOfYear() === it : card;
       })
       .forEach((card) => {
         const pointController = new PointController(day.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange);
@@ -66,6 +67,7 @@ export default class TripController {
     this._pointModel.setDataChangeHandler(this._onPointDataChange);
 
     this._priceChangeHandlers = [];
+    this._routeChangeHandlers = [];
   }
 
   render() {
@@ -95,7 +97,7 @@ export default class TripController {
       return;
     }
 
-    this._creatingCard = new PointController(this._container.getElement(), this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(this._tripList.getElement(), this._onDataChange, this._onViewChange);
     this._creatingCard.render(this._emptyCard, PointControllerMode.ADDING);
   }
 
@@ -111,8 +113,20 @@ export default class TripController {
     this._priceChangeHandlers.push(handler);
   }
 
+  setRouteChangeHandler(handler) {
+    this._routeChangeHandlers.push(handler);
+  }
+
   getTotalPrice() {
     return this._totalPrice;
+  }
+
+  getPoints() {
+    return this._pointModel.getPoints();
+  }
+
+  resetBoard() {
+    this._showedCardControllers.forEach((it) => it.replaceEditView());
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -212,6 +226,7 @@ export default class TripController {
     );
     this._totalPrice = getTotalPrice(this._pointModel.getPoints());
     this._callHandlers(this._priceChangeHandlers);
+    this._callHandlers(this._routeChangeHandlers);
   }
 
   _onFilterChange() {

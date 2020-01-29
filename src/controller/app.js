@@ -32,10 +32,13 @@ export default class App {
     this._pointModel = new PointModel();
     this._tripEvents = new TripEvents();
     this._priceComponent = new Price();
+    this._routeComponent = new Route();
 
     this._trip = new TripController(this._tripEvents, this._pointModel, this._apiWithProvider);
     this._onPriceChange = this._onPriceChange.bind(this);
     this._trip.setPriceChangeHandler(this._onPriceChange);
+    this._onRouteChange = this._onRouteChange.bind(this);
+    this._trip.setRouteChangeHandler(this._onRouteChange);
   }
 
   render() {
@@ -60,7 +63,8 @@ export default class App {
     this._apiWithProvider.getData()
       .then((points) => {
         this._pointModel.setPoints(points);
-        render(tripRoute, new Route(points), RenderPosition.AFTERBEGIN);
+        render(tripRoute, this._routeComponent, RenderPosition.AFTERBEGIN);
+        this._routeComponent.setRoute(points);
         filterController.render();
         render(tripRoute, this._priceComponent, RenderPosition.BEFOREEND);
         this._priceComponent.setTotalPrice(this._trip.getTotalPrice());
@@ -101,6 +105,7 @@ export default class App {
   _setEventAddBtn() {
     const eventAddBtn = document.querySelector(`.trip-main__event-add-btn`);
     eventAddBtn.addEventListener(`click`, () => {
+      this._trip.resetBoard();
       this._trip.createCard();
     });
   }
@@ -122,5 +127,9 @@ export default class App {
 
   _onPriceChange() {
     this._priceComponent.setTotalPrice(this._trip.getTotalPrice());
+  }
+
+  _onRouteChange() {
+    this._routeComponent.setRoute(this._trip.getPoints());
   }
 }

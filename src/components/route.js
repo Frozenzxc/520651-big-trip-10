@@ -7,23 +7,27 @@ const getTripRoutes = (cards) => {
   return cards[0].destination.name + ` - ... - ` + cards[cards.length - 1].destination.name;
 };
 
-const createRouteTemplate = (cards) => {
+const createRouteTemplate = () => {
 
   return (
     `<div class="trip-info__main">
-        <h1 class="trip-info__title">${getTripRoutes(cards)}</h1>
-        <p class="trip-info__dates">${(new Date(cards[0].startTime)).toDateString().substr(4, 6)}&nbsp;&mdash;&nbsp;${(new Date(cards[cards.length - 1].endTime)).toDateString().substr(4, 6)}</p>
+        <h1 class="trip-info__title"></h1>
+        <p class="trip-info__dates"></p>
     </div>`
   );
 };
 
 export default class Route extends AbstractComponent {
-  constructor(cards) {
+  constructor() {
     super();
-    this._cards = cards;
   }
 
   getTemplate() {
-    return createRouteTemplate(this._cards);
+    return createRouteTemplate();
+  }
+
+  setRoute(cards) {
+    this.getElement().querySelector(`.trip-info__title`).textContent = getTripRoutes(cards);
+    this.getElement().querySelector(`.trip-info__dates`).textContent = (new Date(cards[0].startTime)).toDateString().substr(4, 6) + ` - ` + (new Date(cards[cards.length - 1].endTime)).toDateString().substr(4, 6);
   }
 }

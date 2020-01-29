@@ -78,15 +78,8 @@ export default class PointController extends AbstractComponent {
     });
 
     this._cardEditComponent.setEditCloseButtonClickHandler(() => {
-      this._cardEditComponent.setData({
-        saveButtonText: `Saving...`,
-      });
-      this._cardEditComponent.disableForm();
-      const pointData = this._cardEditComponent.getData();
-      const data = parseFormData(pointData.form, pointData.offers);
-
-      this._onDataChange(this, card, data);
-      this._cardEditComponent.activateForm();
+      this._cardEditComponent.resetForm();
+      this._replaceEditToCard();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
 
@@ -167,6 +160,11 @@ export default class PointController extends AbstractComponent {
     }
   }
 
+  replaceEditView() {
+    this._cardEditComponent.resetForm();
+    this._replaceEditToCard();
+  }
+
   destroy() {
     remove(this._cardEditComponent);
     remove(this._cardComponent);
@@ -196,7 +194,7 @@ export default class PointController extends AbstractComponent {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyCard, null);
+        this.destroy();
       }
       this._replaceEditToCard();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
