@@ -74,6 +74,7 @@ export default class PointController extends AbstractComponent {
 
     this._cardComponent.setEditButtonClickHandler(() => {
       this._replaceCardToEdit();
+
       document.addEventListener(`keydown`, this._onEscKeyDown);
     });
 
@@ -191,7 +192,7 @@ export default class PointController extends AbstractComponent {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this.destroy();
+        this._onDataChange(this, EmptyCard, null);
       }
       this._replaceEditToCard();
       document.removeEventListener(`keydown`, this._onEscKeyDown);

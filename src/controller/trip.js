@@ -64,7 +64,7 @@ export default class TripController {
     this._onPointDataChange = this._onPointDataChange.bind(this);
 
     this._pointModel.setFilterChangeHandler(this._onFilterChange);
-    this._pointModel.setDataChangeHandler(this._onPointDataChange);
+
 
     this._priceChangeHandlers = [];
     this._routeChangeHandlers = [];
@@ -73,7 +73,7 @@ export default class TripController {
   render() {
     const container = this._container.getElement();
     const cards = this._pointModel.getPoints();
-
+    this._pointModel.setDataChangeHandler(this._onPointDataChange);
     if (!cards.length) {
       render(container, this._noCards, RenderPosition.BEFOREEND);
     }
@@ -125,8 +125,12 @@ export default class TripController {
     return this._pointModel.getPoints();
   }
 
+  onNewEventClick() {
+    this._onViewChange();
+  }
+
   _onDataChange(pointController, oldData, newData) {
-    if (oldData === this._emptyCard) {
+    if (oldData === EmptyCard) {
       this._creatingCard = null;
       if (newData === null) {
         pointController.destroy();

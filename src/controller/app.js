@@ -67,11 +67,9 @@ export default class App {
         this._routeComponent.setRoute(points);
         filterController.render();
         render(tripRoute, this._priceComponent, RenderPosition.BEFOREEND);
-        this._priceComponent.setTotalPrice(this._trip.getTotalPrice());
         this._trip.render();
+        this._priceComponent.setTotalPrice(this._trip.getTotalPrice());
       });
-
-
   }
 
   registerSW() {
@@ -105,6 +103,7 @@ export default class App {
   _setEventAddBtn() {
     const eventAddBtn = document.querySelector(`.trip-main__event-add-btn`);
     eventAddBtn.addEventListener(`click`, () => {
+      this._trip.onNewEventClick();
       this._trip.createCard();
     });
   }
