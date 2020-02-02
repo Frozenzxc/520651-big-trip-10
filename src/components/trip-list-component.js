@@ -5,7 +5,7 @@ const createTripListTemplate = () => {
   return (`<ul class="trip-days"></ul>`);
 };
 
-export default class TripList extends AbstractComponent {
+export default class TripListComponent extends AbstractComponent {
   getTemplate() {
     return createTripListTemplate();
   }

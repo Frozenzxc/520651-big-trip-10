@@ -34,8 +34,8 @@ const calcTransportTypeCount = (cards, type) => {
 };
 
 const getDuration = (start, end) => {
-  let startTime = moment(start);
-  let endTime = moment(end);
+  const startTime = moment(start);
+  const endTime = moment(end);
   const diff = endTime.diff(startTime);
 
   return moment(diff);
@@ -311,7 +311,7 @@ const createStatsTemplate = () => {
   );
 };
 
-export default class Statistics extends AbstractSmartComponent {
+export default class StatisticsComponent extends AbstractSmartComponent {
   constructor(cards) {
     super();
     this._cards = cards;

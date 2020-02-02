@@ -1,48 +1,48 @@
 import {render, RenderPosition} from "../utils/render";
 import {
-  Menu, Price,
-  Route,
-  Statistics,
-  TripEvents,
+  MenuComponent, PriceComponent,
+  RouteComponent,
+  StatisticsComponent,
+  TripEventsComponent,
 } from "../components/index";
-import TripController from "../controller/trip";
-import PointModel from "../models/points";
-import FilterController from "../controller/filter";
+import TripController from "./trip-controller";
+import PointModel from "../models/points-model";
+import FilterController from "./filter-controller";
 import {MenuItem} from "../components/index";
 import Api from "../api/index";
 import Backup from "../api/backup";
 import Provider from "../api/provider";
 import "flatpickr/dist/flatpickr.css";
-import {randomString} from "../utils/common";
+import {getRandomString} from "../utils/common";
 
 const BACKUP_PREFIX = `big-trip-cache`;
 const BACKUP_VER = `v1`;
 const BACKUP_NAME = `${BACKUP_PREFIX}-${BACKUP_VER}`;
 
-const AUTHORIZATION = `Basic ` + randomString();
+const AUTHORIZATION = `Basic ` + getRandomString();
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 
-export default class App {
+export default class AppController {
   constructor() {
     this._api = new Api(END_POINT, AUTHORIZATION);
     this._backup = new Backup(BACKUP_NAME, window.localStorage);
     this._apiWithProvider = new Provider(this._api, this._backup);
-    this._siteMenuComponent = new Menu();
+    this._siteMenuComponent = new MenuComponent();
 
     this._pointModel = new PointModel();
-    this._tripEvents = new TripEvents();
-    this._priceComponent = new Price();
-    this._routeComponent = new Route();
+    this._tripEvents = new TripEventsComponent();
+    this._priceComponent = new PriceComponent();
+    this._routeComponent = new RouteComponent();
 
     this._trip = new TripController(this._tripEvents, this._pointModel, this._apiWithProvider);
-    this._onPriceChange = this._onPriceChange.bind(this);
-    this._trip.setPriceChangeHandler(this._onPriceChange);
-    this._onRouteChange = this._onRouteChange.bind(this);
-    this._trip.setRouteChangeHandler(this._onRouteChange);
+    this._priceChangeHandler = this._priceChangeHandler.bind(this);
+    this._trip.setPriceChangeHandler(this._priceChangeHandler);
+    this._routeChangeHandler = this._routeChangeHandler.bind(this);
+    this._trip.setRouteChangeHandler(this._routeChangeHandler);
   }
 
   render() {
-    this._statisticsComponent = new Statistics(this._pointModel);
+    this._statisticsComponent = new StatisticsComponent(this._pointModel);
     const siteMainElement = document.querySelector(`.page-main`);
     const mainElementContainer = siteMainElement.querySelector(`.page-body__container`);
     const siteHeaderControls = document.querySelector(`.trip-controls`);
@@ -123,11 +123,11 @@ export default class App {
     });
   }
 
-  _onPriceChange() {
+  _priceChangeHandler() {
     this._priceComponent.setTotalPrice(this._trip.getTotalPrice());
   }
 
-  _onRouteChange() {
+  _routeChangeHandler() {
     this._routeComponent.setRoute(this._trip.getPoints());
   }
 }

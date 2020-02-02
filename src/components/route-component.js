@@ -17,9 +17,12 @@ const createRouteTemplate = () => {
   );
 };
 
-export default class Route extends AbstractComponent {
+export default class RouteComponent extends AbstractComponent {
   constructor() {
     super();
+
+    this._tripTitle = this.getElement().querySelector(`.trip-info__title`);
+    this._tripDates = this.getElement().querySelector(`.trip-info__dates`);
   }
 
   getTemplate() {
@@ -27,7 +30,7 @@ export default class Route extends AbstractComponent {
   }
 
   setRoute(cards) {
-    this.getElement().querySelector(`.trip-info__title`).textContent = getTripRoutes(cards);
-    this.getElement().querySelector(`.trip-info__dates`).textContent = (new Date(cards[0].startTime)).toDateString().substr(4, 6) + ` - ` + (new Date(cards[cards.length - 1].endTime)).toDateString().substr(4, 6);
+    this._tripTitle.textContent = getTripRoutes(cards);
+    this._tripDates.textContent = (new Date(cards[0].startTime)).toDateString().substr(4, 6) + ` - ` + (new Date(cards[cards.length - 1].endTime)).toDateString().substr(4, 6);
   }
 }

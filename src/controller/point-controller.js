@@ -1,7 +1,7 @@
 import AbstractComponent from "../components/abstract-component";
 import {render, RenderPosition, replace, remove} from "../utils/render";
-import {Card, CardEdit} from "../components";
-import Point from "../models/point";
+import {CardComponent, CardEdit} from "../components";
+import PointModel from "../models/point-model";
 import {formatAfterFlatpickr} from "../utils/common";
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
@@ -27,20 +27,18 @@ const parseFormData = (formData, offers) => {
   const desc = document.querySelector(`.event__destination-description`).textContent;
   let pictures = [];
   document.querySelectorAll(`.event__photo`).forEach((it) => {
-    pictures.push({src: it.src, desc: it.alt});
+    pictures.push({
+      'src': `` + it.src,
+      'description': `` + it.alt,
+    });
   });
 
-  return new Point({
+  return new PointModel({
     'type': formData.get(`event-type`),
     'destination': {
       'name': formData.get(`event-destination`),
       'description': desc,
-      'pictures': pictures.map((it) => {
-        return {
-          'src': `` + it.src,
-          'description': `` + it.desc,
-        };
-      }),
+      'pictures': pictures,
     },
     'date_from': formatAfterFlatpickr(formData.get(`event-start-time`)),
     'date_to': formatAfterFlatpickr(formData.get(`event-end-time`)),
@@ -51,12 +49,12 @@ const parseFormData = (formData, offers) => {
 };
 
 export default class PointController extends AbstractComponent {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, dataChangeHandler, viewChangeHandler) {
     super();
 
     this._container = container;
-    this._onDataChange = onDataChange;
-    this._onViewChange = onViewChange;
+    this._dataChangeHandler = dataChangeHandler;
+    this._viewChangeHandler = viewChangeHandler;
     this._mode = Mode.DEFAULT;
     this._cardComponent = null;
     this._cardEditComponent = null;
@@ -69,7 +67,7 @@ export default class PointController extends AbstractComponent {
     const oldCardEditComponent = this._cardEditComponent;
     this._mode = mode;
 
-    this._cardComponent = new Card(card);
+    this._cardComponent = new CardComponent(card);
     this._cardEditComponent = new CardEdit(card);
 
     this._cardComponent.setEditButtonClickHandler(() => {
@@ -93,7 +91,7 @@ export default class PointController extends AbstractComponent {
       this._cardEditComponent.disableForm();
       const pointData = this._cardEditComponent.getData();
       const data = parseFormData(pointData.form, pointData.offers);
-      this._onDataChange(this, card, data);
+      this._dataChangeHandler(this, card, data);
       this._cardEditComponent.activateForm();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     });
@@ -103,7 +101,7 @@ export default class PointController extends AbstractComponent {
         deleteButtonText: `Deleting...`,
       });
       this._cardEditComponent.disableForm();
-      this._onDataChange(this, card, null);
+      this._dataChangeHandler(this, card, null);
       this._cardEditComponent.activateForm();
     });
 
@@ -111,7 +109,7 @@ export default class PointController extends AbstractComponent {
 
       const data = this._cardEditComponent.getFavorite();
 
-      this._onDataChange(this, card, data);
+      this._dataChangeHandler(this, card, data);
     });
 
     switch (mode) {
@@ -163,6 +161,12 @@ export default class PointController extends AbstractComponent {
     }
   }
 
+  deleteNewPoint() {
+    if (this._mode !== Mode.ADDING) {
+      this._dataChangeHandler(this, EmptyCard, null);
+    }
+  }
+
   destroy() {
     remove(this._cardEditComponent);
     remove(this._cardComponent);
@@ -181,7 +185,7 @@ export default class PointController extends AbstractComponent {
   }
 
   _replaceCardToEdit() {
-    this._onViewChange();
+    this._viewChangeHandler();
 
     replace(this._cardEditComponent, this._cardComponent);
     this._mode = Mode.EDIT;
@@ -192,7 +196,7 @@ export default class PointController extends AbstractComponent {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyCard, null);
+        this._dataChangeHandler(this, EmptyCard, null);
       }
       this._replaceEditToCard();
       document.removeEventListener(`keydown`, this._onEscKeyDown);

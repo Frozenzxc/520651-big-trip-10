@@ -1,7 +1,7 @@
 import {FilterType} from "../const";
 import {getCardsByFilter} from "../utils/filter";
 
-export default class Points {
+export default class PointsModel {
   constructor() {
     this._cards = [];
     this._activeFilterType = FilterType.EVERYTHING;

@@ -3,14 +3,15 @@ import moment from "moment";
 const HOUR_PER_MS = 3600000;
 const DAY_PER_MS = 86400000;
 const AUTHOROZATION_STRING_LENGTH = 15;
+const SYMBOLS = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
 
-const randomString = () => {
+
+const getRandomString = () => {
   let result = ``;
-  const symbols = `0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`;
-  const maxPosition = symbols.length - 1;
+  const maxPosition = SYMBOLS.length - 1;
   for (let i = 0; i < AUTHOROZATION_STRING_LENGTH; ++i) {
     let position = Math.floor(Math.random() * maxPosition);
-    result = result + symbols.substring(position, position + 1);
+    result = result + SYMBOLS.substring(position, position + 1);
   }
   return result;
 };
@@ -66,4 +67,4 @@ const isFutureDate = (startTime, date) => {
   return startTime >= Date.parse(date);
 };
 
-export {formatTime, getDuration, setDateTimeAttr, isOverdueDate, isFutureDate, getTripDates, formatAfterFlatpickr, formatCardTitle, randomString};
+export {formatTime, getDuration, setDateTimeAttr, isOverdueDate, isFutureDate, getTripDates, formatAfterFlatpickr, formatCardTitle, getRandomString};

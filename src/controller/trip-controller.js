@@ -1,29 +1,29 @@
 import {render, RenderPosition} from "../utils/render";
 import {
-  NoCards,
-  TripDays,
-  TripList,
-  Sort
+  NoCardsComponent,
+  TripDaysComponent,
+  TripListComponent,
+  SortComponent
 } from "../components/index";
 import {SortType} from "../components/index";
-import PointController, {EmptyCard, Mode} from "./point";
+import PointController, {EmptyCard, Mode} from "./point-controller";
 import {getTripDates} from "../utils/common";
 import moment from "moment";
 
-const renderCards = (container, cards, onDataChange, onViewChange, mode, isSortedByDefault) => {
+const renderCards = (container, cards, dataChangeHandler, viewChangeHandler, mode, isSortedByDefault) => {
   let controllers = [];
 
   const tripDates = isSortedByDefault ? [...getTripDates(cards)].sort((a, b) => a - b) : [true];
 
   tripDates.forEach((it, index) => {
-    const day = isSortedByDefault ? new TripDays(moment().dayOfYear(it), index + 1) : new TripDays();
+    const day = isSortedByDefault ? new TripDaysComponent(moment().dayOfYear(it), index + 1) : new TripDaysComponent();
 
     cards
       .filter((card) => {
         return isSortedByDefault ? moment(card.startTime).dayOfYear() === it : card;
       })
       .forEach((card) => {
-        const pointController = new PointController(day.getElement().querySelector(`.trip-events__list`), onDataChange, onViewChange);
+        const pointController = new PointController(day.getElement().querySelector(`.trip-events__list`), dataChangeHandler, viewChangeHandler);
         pointController.render(card, mode);
 
         controllers.push(pointController);
@@ -54,16 +54,16 @@ export default class TripController {
     this._isSortedByDefault = true;
     this._totalPrice = null;
 
-    this._noCards = new NoCards();
-    this._sort = new Sort();
-    this._tripList = new TripList();
-    this._onDataChange = this._onDataChange.bind(this);
-    this._onViewChange = this._onViewChange.bind(this);
-    this._onSortTypeChange = this._onSortTypeChange.bind(this);
-    this._onFilterChange = this._onFilterChange.bind(this);
-    this._onPointDataChange = this._onPointDataChange.bind(this);
+    this._noCards = new NoCardsComponent();
+    this._sort = new SortComponent();
+    this._tripList = new TripListComponent();
+    this._dataChangeHandler = this._dataChangeHandler.bind(this);
+    this._viewChangeHandler = this._viewChangeHandler.bind(this);
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+    this._filterChangeHandler = this._filterChangeHandler.bind(this);
+    this._pointDateChangeHandler = this._pointDateChangeHandler.bind(this);
 
-    this._pointModel.setFilterChangeHandler(this._onFilterChange);
+    this._pointModel.setFilterChangeHandler(this._filterChangeHandler);
 
 
     this._priceChangeHandlers = [];
@@ -73,7 +73,7 @@ export default class TripController {
   render() {
     const container = this._container.getElement();
     const cards = this._pointModel.getPoints();
-    this._pointModel.setDataChangeHandler(this._onPointDataChange);
+    this._pointModel.setDataChangeHandler(this._pointDateChangeHandler);
     if (!cards.length) {
       render(container, this._noCards, RenderPosition.BEFOREEND);
     }
@@ -83,13 +83,13 @@ export default class TripController {
 
     this._showedCardControllers = renderCards(
         this._tripList,
-        this._pointModel.getPoints(),
-        this._onDataChange,
-        this._onViewChange,
+        cards,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
         Mode.DEFAULT,
         this._isSortedByDefault
     );
-    this._sort.setSortTypeChangeHandler(this._onSortTypeChange);
+    this._sort.setSortTypeChangeHandler(this._sortTypeChangeHandler);
   }
 
   createCard() {
@@ -97,7 +97,7 @@ export default class TripController {
       return;
     }
 
-    this._creatingCard = new PointController(this._tripList.getElement(), this._onDataChange, this._onViewChange);
+    this._creatingCard = new PointController(this._tripList.getElement(), this._dataChangeHandler, this._viewChangeHandler);
     this._creatingCard.render(this._emptyCard, Mode.ADDING);
   }
 
@@ -126,11 +126,11 @@ export default class TripController {
   }
 
   onNewEventClick() {
-    this._onViewChange();
+    this._viewChangeHandler();
   }
 
-  _onDataChange(pointController, oldData, newData) {
-    if (oldData === EmptyCard) {
+  _dataChangeHandler(pointController, oldData, newData) {
+    if (oldData === this._emptyCard || oldData === EmptyCard) {
       this._creatingCard = null;
       if (newData === null) {
         pointController.destroy();
@@ -174,11 +174,11 @@ export default class TripController {
     }
   }
 
-  _onViewChange() {
+  _viewChangeHandler() {
     this._showedCardControllers.forEach((it) => it.setDefaultView());
   }
 
-  _onSortTypeChange(sortType) {
+  _sortTypeChangeHandler(sortType) {
     let sortedCards = [];
     const cards = this._pointModel.getPoints();
 
@@ -201,8 +201,8 @@ export default class TripController {
     this._showedCardControllers = renderCards(
         this._tripList,
         sortedCards,
-        this._onDataChange,
-        this._onViewChange,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
         Mode.DEFAULT,
         this._isSortedByDefault
     );
@@ -216,11 +216,17 @@ export default class TripController {
 
   _updateCards() {
     this._removeCards();
+    const container = this._container.getElement();
+    const cards = this._pointModel.getPoints();
+
+    if (!cards.length) {
+      render(container, this._noCards, RenderPosition.BEFOREEND);
+    }
     this._showedCardControllers = renderCards(
         this._tripList,
         this._pointModel.getPoints(),
-        this._onDataChange,
-        this._onViewChange,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
         Mode.DEFAULT,
         this._isSortedByDefault
     );
@@ -229,11 +235,12 @@ export default class TripController {
     this._callHandlers(this._routeChangeHandlers);
   }
 
-  _onFilterChange() {
+  _filterChangeHandler() {
+    this._showedCardControllers.forEach((it) => it.deleteNewPoint());
     this._updateCards();
   }
 
-  _onPointDataChange() {
+  _pointDateChangeHandler() {
     this._updateCards();
   }
 

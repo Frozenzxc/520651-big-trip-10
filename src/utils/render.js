@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify/dist/purify.min";
+
 const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
@@ -5,7 +7,7 @@ const RenderPosition = {
 
 const createElement = (template) => {
   const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
+  newElement.innerHTML = DOMPurify.sanitize(template);
 
   return newElement.firstChild;
 };

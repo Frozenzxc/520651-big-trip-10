@@ -1,5 +1,5 @@
-import Point from "../models/point";
-import Store from "../models/store";
+import PointModel from "../models/point-model";
+import StoreModel from "../models/store-model";
 
 const Method = {
   GET: `GET`,
@@ -7,6 +7,8 @@ const Method = {
   PUT: `PUT`,
   DELETE: `DELETE`
 };
+
+const URLS = [`destinations`, `offers`, `points`];
 
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
@@ -23,23 +25,23 @@ export default class Index {
   }
 
   getData() {
-    const urls = [`destinations`, `offers`, `points`];
-    let requests = urls.map((it) => this._load({url: it}));
+
+    const requests = URLS.map((it) => this._load({url: it}));
     return Promise.all(requests)
       .then((responses) => Promise.all(responses.map((it) => it.json())))
       .then((responses) => {
         const [destinations, offers, points] = responses;
-        Store.setAllDestinations(destinations);
-        Store.setOffers(offers);
+        StoreModel.setAllDestinations(destinations);
+        StoreModel.setOffers(offers);
         return points;
       })
-      .then(Point.parsePoints);
+      .then(PointModel.parsePoints);
   }
 
   getPoints() {
     return this._load({url: `points`})
       .then((response) => response.json())
-      .then(Point.parsePoints);
+      .then(PointModel.parsePoints);
   }
 
   createPoint(point) {
@@ -50,18 +52,18 @@ export default class Index {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then((response) => response.json())
-      .then(Point.parsePoint);
+      .then(PointModel.parsePoint);
   }
 
-  updatePoint(id, data) {
+  updatePoint(id, point) {
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data.toRAW()),
+      body: JSON.stringify(point.toRAW()),
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then((response) => response.json())
-      .then(Point.parsePoint);
+      .then(PointModel.parsePoint);
   }
 
   deletePoint(id) {
@@ -71,11 +73,11 @@ export default class Index {
     });
   }
 
-  sync(data) {
+  sync(points) {
     return this._load({
       url: `points/sync`,
       method: Method.POST,
-      body: JSON.stringify(data),
+      body: JSON.stringify(points),
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then((response) => response.json());

@@ -1,4 +1,4 @@
-export default class Point {
+export default class PointModel {
   constructor(data) {
     this.id = data[`id`];
     this.type = data[`type`];
@@ -23,15 +23,15 @@ export default class Point {
     };
   }
 
-  static parsePoint(data) {
-    return new Point(data);
+  static parsePoint(point) {
+    return new PointModel(point);
   }
 
-  static parsePoints(data) {
-    return data.map(Point.parsePoint);
+  static parsePoints(points) {
+    return points.map(PointModel.parsePoint);
   }
 
-  static clone(data) {
-    return new Point(data.toRAW());
+  static clone(point) {
+    return new PointModel(point.toRAW());
   }
 }

@@ -1,15 +1,15 @@
-export default class Store {
+export default class StoreModel {
   constructor() {
     this._destinations = [];
     this._offers = [];
   }
 
-  static setAllDestinations(data) {
-    this._destinations = data;
+  static setAllDestinations(destinations) {
+    this._destinations = destinations;
   }
 
-  static setOffers(data) {
-    this._offers = data;
+  static setOffers(offers) {
+    this._offers = offers;
   }
 
   static getAllDestinations() {

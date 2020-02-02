@@ -1,30 +1,30 @@
-import Menu, {MenuItem} from "./menu";
-import Sort from "./sort";
-import Filter from "./filter";
-import Route from "./route";
-import Card from "./card";
-import CardEdit from "./card-editor";
-import TripDays from "./trip-days";
-import NoCards from "./no-cards";
-import TripList from "./trip-list";
-import {SortType} from "./sort";
-import Statistics from "./statistics";
-import TripEvents from "./trip-events";
-import Price from "./price";
+import MenuComponent, {MenuItem} from "./menu-component";
+import SortComponent from "./sort-component";
+import FilterComponent from "./filter-component";
+import RouteComponent from "./route-component";
+import CardComponent from "./card-component";
+import CardEdit from "./card-edit-component";
+import TripDaysComponent from "./trip-days-component";
+import NoCardsComponent from "./no-cards-component";
+import TripListComponent from "./trip-list-component";
+import {SortType} from "./sort-component";
+import StatisticsComponent from "./statistics-component";
+import TripEventsComponent from "./trip-events-component";
+import PriceComponent from "./price-component";
 
 export {
-  Menu,
-  Sort,
-  Filter,
-  Route,
-  Card,
+  MenuComponent,
+  SortComponent,
+  FilterComponent,
+  RouteComponent,
+  CardComponent,
   CardEdit,
-  TripDays,
-  NoCards,
-  TripList,
+  TripDaysComponent,
+  NoCardsComponent,
+  TripListComponent,
   SortType,
-  Statistics,
+  StatisticsComponent,
   MenuItem,
-  TripEvents,
-  Price
+  TripEventsComponent,
+  PriceComponent
 };

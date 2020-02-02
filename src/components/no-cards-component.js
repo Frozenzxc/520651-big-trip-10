@@ -7,7 +7,7 @@ const createNoCardsTemplate = () => {
 };
 
 
-export default class NoCards extends AbstractComponent {
+export default class NoCardsComponent extends AbstractComponent {
   getTemplate() {
     return createNoCardsTemplate();
   }

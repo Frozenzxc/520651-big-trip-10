@@ -1,8 +1,11 @@
 import {formatTime, getDuration, setDateTimeAttr, formatCardTitle} from "../utils/common";
 import AbstractComponent from "./abstract-component";
 
+const SHOWED_OFFERS = 3;
+
 const createOfferMarkup = (offers) => {
   return offers
+    .slice(0, SHOWED_OFFERS)
     .map(({title, price}) => {
       return (
         `<li class="event__offer">
@@ -49,10 +52,11 @@ const createCardTemplate = (card) => {
   );
 };
 
-export default class Card extends AbstractComponent {
+export default class CardComponent extends AbstractComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._editBtn = this.getElement().querySelector(`.event__rollup-btn`);
   }
 
   getTemplate() {
@@ -60,7 +64,6 @@ export default class Card extends AbstractComponent {
   }
 
   setEditButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, handler);
+    this._editBtn.addEventListener(`click`, handler);
   }
 }

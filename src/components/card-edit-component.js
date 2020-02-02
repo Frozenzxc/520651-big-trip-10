@@ -1,6 +1,6 @@
 import flatpickr from "flatpickr";
 import AbstractSmartComponent from "./abstract-smart-component";
-import Store from "../models/store";
+import StoreModel from "../models/store-model";
 import {setDateTimeAttr, formatCardTitle} from "../utils/common";
 import debounce from "lodash/debounce";
 
@@ -11,12 +11,12 @@ const DefaultData = {
   saveButtonText: `Save`,
 };
 
-const createOfferMarkup = (card, offersArr) => {
-  const index = offersArr.findIndex((it) => it.type === card.type);
+const createOfferMarkup = (card, availableOffers) => {
+  const index = availableOffers.findIndex((it) => it.type === card.type);
 
-  const offers = offersArr[index].offers;
+  const offers = availableOffers[index].offers;
   card.offers.forEach((it) => {
-    const offerIndex = offersArr[index].offers.findIndex((item) => item.title === it.title);
+    const offerIndex = availableOffers[index].offers.findIndex((item) => item.title === it.title);
 
     if (offerIndex === -1) {
       offers.push(it);
@@ -128,7 +128,7 @@ const createCardEditTemplate = (card, options = {}) => {
                         <label class="event__label  event__type-output" for="event-destination-1">
                           ${formatCardTitle(card)}
                         </label>
-                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.destination.name ? card.destination.name : ``}" list="destination-list-1">
+                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${card.destination.name ? card.destination.name : ``}" list="destination-list-1" required>
                         <datalist id="destination-list-1">
                           <option value="Amsterdam"></option>
                           <option value="Geneva"></option>
@@ -153,7 +153,7 @@ const createCardEditTemplate = (card, options = {}) => {
                           <span class="visually-hidden">${card.price}</span>
                           &euro;
                         </label>
-                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${card.price}">
+                        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${card.price}">
                       </div>
 
                       <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
@@ -206,8 +206,11 @@ export default class CardEdit extends AbstractSmartComponent {
     this._editCloseButtonClickHandler = null;
     this._favoriteButtonClickHandler = null;
     this._externalData = DefaultData;
-    this._destinations = Store.getAllDestinations();
-    this._offers = Store.getOffers();
+    this._destinations = StoreModel.getAllDestinations();
+    this._offers = StoreModel.getOffers();
+
+    this._deleteBtn = this.getElement().querySelector(`.event__reset-btn`);
+    this._favoriteBtn = this.getElement().querySelector(`#event-favorite-1`);
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -292,17 +295,14 @@ export default class CardEdit extends AbstractSmartComponent {
   }
 
   setDeleteButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, handler);
+    this._deleteBtn.addEventListener(`click`, handler);
 
     this._deleteButtonClickHandler = handler;
   }
 
   setFavoriteButtonClickHandler(handler) {
-    this.getElement().querySelector(`#event-favorite-1`)
-      .addEventListener(`click`, debounce(handler, DEBOUNCE_TIMEOUT));
-    const elm = this.getElement().querySelector(`#event-favorite-1`);
-    this._card.isFavorite = elm.checked;
+    this._favoriteBtn.addEventListener(`click`, debounce(handler, DEBOUNCE_TIMEOUT));
+    this._card.isFavorite = this._favoriteBtn.checked;
     this._favoriteButtonClickHandler = handler;
   }
 
@@ -363,9 +363,12 @@ export default class CardEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--destination`)
       .addEventListener(`change`, (evt) => {
         const index = this._destinations.findIndex((it) => it.name === evt.target.value);
-        this._card.destination = this._destinations[index];
-
-        this.rerender();
+        if (index >= 0) {
+          this._card.destination = this._destinations[index];
+          this.rerender();
+        } else {
+          evt.target.setCustomValidity(`Выберите точку назначения из списка`);
+        }
       });
 
     element.querySelector(`.event__favorite-checkbox`)

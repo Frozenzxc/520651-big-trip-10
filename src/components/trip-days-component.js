@@ -12,7 +12,7 @@ const createTripsTemplate = (board, dayCount) => {
   );
 };
 
-export default class TripDays extends AbstractComponent {
+export default class TripDaysComponent extends AbstractComponent {
   constructor(board, dayCount) {
     super();
     this._board = board;

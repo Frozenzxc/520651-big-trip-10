@@ -16,7 +16,7 @@ const createMenuTemplate = () => {
   );
 };
 
-export default class Menu extends AbstractComponent {
+export default class MenuComponent extends AbstractComponent {
   constructor() {
     super();
   }

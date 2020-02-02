@@ -1,5 +1,5 @@
 import nanoid from "nanoid";
-import Point from "../models/point";
+import PointModel from "../models/point-model";
 
 const getSyncedPoints =
   (items) => items.filter(({success}) => success).map(({payload}) => payload.point);
@@ -25,7 +25,7 @@ export default class Provider {
 
     this._isSynchronized = false;
 
-    return Promise.resolve(Point.parsePoints(storePoints));
+    return Promise.resolve(PointModel.parsePoints(storePoints));
   }
 
   getPoints() {
@@ -41,7 +41,7 @@ export default class Provider {
 
     this._isSynchronized = false;
 
-    return Promise.resolve(Point.parsePoints(storePoints));
+    return Promise.resolve(PointModel.parsePoints(storePoints));
   }
 
   createPoint(point) {
@@ -55,7 +55,7 @@ export default class Provider {
     }
 
     const fakeNewPointId = nanoid();
-    const fakeNewPoint = Point.parsePoint(Object.assign({}, point.toRAW(), {id: fakeNewPointId}));
+    const fakeNewPoint = PointModel.parsePoint(Object.assign({}, point.toRAW(), {id: fakeNewPointId}));
     this._isSynchronized = false;
 
     this._backup.setItem(fakeNewPoint.id, Object.assign({}, fakeNewPoint.toRAW(), {offline: true}));

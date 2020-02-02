@@ -1,6 +1,6 @@
-import App from "./controller/app";
+import AppController from "./controller/app-controller";
 
-const app = new App();
+const app = new AppController();
 app.registerSW();
 app.render();
 app.syncSW();

@@ -1,5 +1,5 @@
 import {FilterType} from "../const";
-import {Filter} from "../components";
+import {FilterComponent} from "../components";
 import {render, replace, RenderPosition} from "../utils/render";
 
 export default class FilterController {
@@ -11,7 +11,7 @@ export default class FilterController {
 
     this._filterComponent = null;
 
-    this._onFilterChange = this._onFilterChange.bind(this);
+    this._filterChangeHandler = this._filterChangeHandler.bind(this);
   }
 
   render() {
@@ -25,8 +25,8 @@ export default class FilterController {
 
     const oldComponent = this._filterComponent;
 
-    this._filterComponent = new Filter(filters);
-    this._filterComponent.setFilterChangeHandler(this._onFilterChange);
+    this._filterComponent = new FilterComponent(filters);
+    this._filterComponent.setFilterChangeHandler(this._filterChangeHandler);
 
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
@@ -35,7 +35,7 @@ export default class FilterController {
     }
   }
 
-  _onFilterChange(filterType) {
+  _filterChangeHandler(filterType) {
     this._pointModel.setFilter(filterType);
     this._activeFilterType = filterType;
   }

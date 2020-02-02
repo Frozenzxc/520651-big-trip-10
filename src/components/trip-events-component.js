@@ -7,7 +7,7 @@ const createTripEventsTemplate = () => {
 `);
 };
 
-export default class TripEvents extends AbstractComponent {
+export default class TripEventsComponent extends AbstractComponent {
   getTemplate() {
     return createTripEventsTemplate();
   }

@@ -6,10 +6,11 @@ const createPriceTemplate = () => {
   </p>`);
 };
 
-export default class Price extends AbstractSmartComponent {
+export default class PriceComponent extends AbstractSmartComponent {
   constructor() {
     super();
 
+    this._tripPrice = this.getElement().querySelector(`.trip-info__cost-value`);
   }
 
   getTemplate() {
@@ -17,6 +18,6 @@ export default class Price extends AbstractSmartComponent {
   }
 
   setTotalPrice(price) {
-    this.getElement().querySelector(`.trip-info__cost-value`).textContent = price;
+    this._tripPrice.textContent = price;
   }
 }
