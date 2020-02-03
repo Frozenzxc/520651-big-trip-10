@@ -236,8 +236,8 @@ export default class TripController {
   }
 
   _filterChangeHandler() {
-    this._showedCardControllers.forEach((it) => it.deleteNewPoint());
     this._updateCards();
+    this._creatingCard = null;
   }
 
   _pointDateChangeHandler() {

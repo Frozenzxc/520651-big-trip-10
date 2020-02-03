@@ -15,8 +15,8 @@ const Mode = {
 const EmptyCard = {
   type: `taxi`,
   destination: ``,
-  startTime: Date.parse(new Date()),
-  endTime: Date.parse(new Date()),
+  startTime: new Date(),
+  endTime: new Date(),
   offers: [],
   description: ``,
   price: 0,
@@ -59,7 +59,7 @@ export default class PointController extends AbstractComponent {
     this._cardComponent = null;
     this._cardEditComponent = null;
 
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
   render(card, mode) {
@@ -73,13 +73,13 @@ export default class PointController extends AbstractComponent {
     this._cardComponent.setEditButtonClickHandler(() => {
       this._replaceCardToEdit();
 
-      document.addEventListener(`keydown`, this._onEscKeyDown);
+      document.addEventListener(`keydown`, this._escKeyDownHandler);
     });
 
     this._cardEditComponent.setEditCloseButtonClickHandler(() => {
       this._cardEditComponent.resetForm();
       this._replaceEditToCard();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      document.removeEventListener(`keydown`, this._escKeyDownHandler);
     });
 
     this._cardEditComponent.setSubmitHandler((evt) => {
@@ -93,7 +93,7 @@ export default class PointController extends AbstractComponent {
       const data = parseFormData(pointData.form, pointData.offers);
       this._dataChangeHandler(this, card, data);
       this._cardEditComponent.activateForm();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      document.removeEventListener(`keydown`, this._escKeyDownHandler);
     });
 
     this._cardEditComponent.setDeleteButtonClickHandler(() => {
@@ -127,10 +127,11 @@ export default class PointController extends AbstractComponent {
           remove(oldCardComponent);
           remove(oldCardEditComponent);
         }
-        document.addEventListener(`keydown`, this._onEscKeyDown);
+        document.addEventListener(`keydown`, this._escKeyDownHandler);
         this._cardEditComponent.setData({
           deleteButtonText: `Cancel`,
         });
+
         this._cardEditComponent.deleteCardCloseButton();
         this._cardEditComponent.clearCardOffers();
         render(this._container, this._cardEditComponent, RenderPosition.AFTERBEGIN);
@@ -161,20 +162,14 @@ export default class PointController extends AbstractComponent {
     }
   }
 
-  deleteNewPoint() {
-    if (this._mode !== Mode.ADDING) {
-      this._dataChangeHandler(this, EmptyCard, null);
-    }
-  }
-
   destroy() {
     remove(this._cardEditComponent);
     remove(this._cardComponent);
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
   _replaceEditToCard() {
-    document.removeEventListener(`keydown`, this._onEscKeyDown);
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
 
     if (document.contains(this._cardEditComponent.getElement())) {
       replace(this._cardComponent, this._cardEditComponent);
@@ -189,7 +184,7 @@ export default class PointController extends AbstractComponent {
     this._mode = Mode.EDIT;
   }
 
-  _onEscKeyDown(evt) {
+  _escKeyDownHandler(evt) {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
@@ -197,7 +192,7 @@ export default class PointController extends AbstractComponent {
         this._dataChangeHandler(this, EmptyCard, null);
       }
       this._replaceEditToCard();
-      document.removeEventListener(`keydown`, this._onEscKeyDown);
+      document.removeEventListener(`keydown`, this._escKeyDownHandler);
     }
   }
 }

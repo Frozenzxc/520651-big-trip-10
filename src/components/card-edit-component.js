@@ -209,7 +209,6 @@ export default class CardEdit extends AbstractSmartComponent {
     this._destinations = StoreModel.getAllDestinations();
     this._offers = StoreModel.getOffers();
 
-    this._deleteBtn = this.getElement().querySelector(`.event__reset-btn`);
     this._favoriteBtn = this.getElement().querySelector(`#event-favorite-1`);
 
     this._applyFlatpickr();
@@ -294,7 +293,7 @@ export default class CardEdit extends AbstractSmartComponent {
   }
 
   setDeleteButtonClickHandler(handler) {
-    this._deleteBtn.addEventListener(`click`, handler);
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
 
     this._deleteButtonClickHandler = handler;
   }
