@@ -29,6 +29,6 @@
     "flatpickr": "4.6.3",
     "lodash": "4.17.20",
     "moment": "2.24.0",
-    "nanoid": "2.1.8"
+    "nanoid": "3.1.31"
   }
 }
